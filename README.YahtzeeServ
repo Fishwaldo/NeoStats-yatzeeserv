@@ -1,0 +1,90 @@
+
+YahtzeeServ Manual
+_________________________________________________________________
+
+   1. Prerequisites and Installation.
+
+        1.1. Compiling and Installation
+
+   2. Basic Configuration
+
+   3. Operational Commands
+
+   Welcome  to  the  YahtzeeServ Manual. This document will aid you in
+   setting up and running YahtzeeServ on your IRC network.
+
+   YahtzeeServ is a Game Service that allows Users to play Yahtzee.
+   Up to 10 players can play at once.
+
+1. Prerequisites and Installation.
+
+   YahtzeeServ is designed to run on Top of NeoStats 3.
+   Please  refer  to  the  NeoStats website  for more
+   information on the requirements for NeoStats.
+
+   YahtzeeServ requires the following:
+     * NeoStats 3.0 or Higher correctly installed and Running
+     * The time to read this entire document.
+
+
+1.1. Compiling and Installation
+
+   As  long  as  you  have  successfully setup NeoStats, and installed it
+   correctly,  Compiling  YahtzeeServ is very simple and straight forward. First
+   you  must  extract  the  files  from  the download package. This is as
+   simple as:
+bash$ tar -xzf YahtzeeServ-<ver>.tar.gz
+
+   This  should  then  create  a  directory  called  YahtzeeServ-<version> where
+   <version> is the Version of YahtzeeServ. Then Proceed to Change into the YahtzeeServ
+   directory, and run Configure as follows:
+bash$./configure [--with-neostats=<dir>]
+
+   --with-neostats=<dir> should be used if your neostats directory is not
+   in a standard location (~/NeoStats3.0/). Replace <dir> with the full path
+   to your NeoStats installation directory (NOT SOURCE DIRECTORY)
+
+   If  the  configuration did not produce a error, you may then move onto
+   Compiling  YahtzeeServ.  Compiling  is simply just issuing the "make" command
+   (or "gmake" if you are running BSD):
+
+   Again,  check  for  Error  messages.  As  long  as there are not error messages,
+   "make install" (or "gmake" if you are running BSD) will install YahtzeeServ, this
+   README file, and any auxiluary files needed into your NeoStats directory:
+
+   Once  Installation  is  complete, you can either configure NeoStats to
+   load YahtzeeServ when it starts, or load YahtzeeServ via IRC.
+
+   To  Configure  NeoStats  to automatically load YahtzeeServ when it boots, add
+   the  following  line  to  your  "neostats.conf"  file  in  the NeoStats
+   directory:
+
+   LOAD_MODULE YahtzeeServ
+
+   To  load  YahtzeeServ  via  IRC,  you must make sure you have the appropriate
+   permissions and issue the following command:
+
+   /msg neostats load YahtzeeServ
+
+   Thats  it.  YahtzeeServ  is  now  loaded  and ready for use (in fact, it will
+   already be running now, but read on for futher information.
+
+2. Basic Configuration
+
+   The Channel YahtzeeServ  plays in is configured online via IRC. When you
+   first start up YahtzeeServ,  it  defaults to playing in "#Games_Yahtzee", to
+   change the channel use the following command:
+
+   /msg YahtzeeServ set chan <#channel>
+
+   The new channel name will be saved for future reference, and YahtzeeServ
+   will message the current channel telling those there where it is moving
+   to, and will part the old channel and join the new one.
+
+   NOTE: if a game is in progress the set chan command will not work.
+
+3. Operational Commands
+
+   YahtzeeServ  has  a  number  of  commands  to play the game in channel.
+   To list the commands send the text "!help"  to the channel YahtzeeServ
+   is set to play in.

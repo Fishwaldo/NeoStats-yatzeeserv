@@ -1,1 +1,20 @@
 * text=auto !eol
+/AUTHORS -text
+/COPYING -text
+/ChangeLog -text
+/LICENSE -text
+/Makefile.in -text
+/NEWS -text
+/README.YahtzeeServ -text
+/RELNOTES -text
+/configure -text
+/configure.in -text
+/events.c -text
+/install-sh -text
+/modconfig.h.in -text
+/modconfigwin32.h -text
+/play.c -text
+/yahtzeeserv.c -text
+/yahtzeeserv.h -text
+/yahtzeeserv.vcproj -text
+/yahtzeeserv_help.c -text
