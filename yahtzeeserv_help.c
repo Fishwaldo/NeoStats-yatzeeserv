@@ -83,6 +83,8 @@ const char *ys_help_stop[] = {
 	"should use REMOVE to leave the game.",
 	"",
 	"NOTE: ChanOP/IRCop access overrides command restrictions.",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -94,6 +96,8 @@ const char *ys_help_join[] = {
 	"NOTE: Joins are allowed once game has",
 	"started, only untill each player has",
 	"scored their first points",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -104,6 +108,8 @@ const char *ys_help_remove[] = {
 	"Removes you from the current game.",
 	"",
 	"With Nick specified, removes Nick from the curent Game.",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -111,6 +117,8 @@ const char *ys_help_players[] = {
 	"Syntax: \2PLAYERS\2",
 	"",
 	"Displays List of Current Players in channel.",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -118,6 +126,8 @@ const char *ys_help_turn[] = {
 	"Syntax: \2TURN\2",
 	"",
 	"Shows Current Player waiting to roll dice, or score.",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -126,6 +136,8 @@ const char *ys_help_pass[] = {
 	"",
 	"Passes your game to nick. the nick MUST be",
 	"connected to the network, and in the channel.",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -134,6 +146,8 @@ const char *ys_help_dice[] = {
 	"",
 	"Shows the dice you have currently",
 	"rolled, in channel",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -141,6 +155,8 @@ const char *ys_help_sheet[] = {
 	"Syntax: \2SHEET\2",
 	"",
 	"Shows your current Score Sheet in channel",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -151,6 +167,8 @@ const char *ys_help_roll[] = {
 	"",
 	"NOTE: Dice are numbered 1 to 5, from left to right",
 	"the position number should be used, not the number showing",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -161,6 +179,8 @@ const char *ys_help_keep[] = {
 	"",
 	"NOTE: Dice are numbered 1 to 5, from left to right",
 	"the position number should be used, not the number showing",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 
@@ -172,6 +192,8 @@ const char *ys_help_score[] = {
 	"Valid Entires are :",
 	"1 , 2 , 3 , 4 , 5 , 6 , fh",
 	"ss , ls , 3k , 4k , c , y",
+	"",
+	"This command is used in Channel ONLY.",
 	NULL
 };
 

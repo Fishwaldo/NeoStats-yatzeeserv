@@ -58,10 +58,6 @@ static bot_cmd ys_commands[]=
 	{"TOP10",	ShowTop10Lists,		0,	0,	ys_help_top10,		ys_help_top10_oneline},
 	{"HIGH",	ShowHighList,		0,	0,	ys_help_high,		ys_help_high_oneline},
 	{"RULES",	ShowRulePages,		0,	0,	ys_help_rules,		ys_help_rules_oneline},
-	{"J",		JoinYahtzeeGame,	0,	0,	ys_help_join,		ys_help_join_oneline,		CMD_FLAG_CHANONLY},
-	{"R",		RollYahtzeeDice,	0,	0,	ys_help_roll,		ys_help_roll_oneline,		CMD_FLAG_CHANONLY},
-	{"K",		KeepYahtzeeDice,	0,	0,	ys_help_keep,		ys_help_keep_oneline,		CMD_FLAG_CHANONLY},
-	{"S",		ScoreYahtzeeDice,	1,	0,	ys_help_score,		ys_help_score_oneline,		CMD_FLAG_CHANONLY},
 	{NULL,		NULL,			0, 	0,	NULL,			NULL}
 };
 

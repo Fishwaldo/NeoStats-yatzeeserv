@@ -248,6 +248,9 @@ void removenickfromgame(Channel *c, Client *u) {
 	}
 	if (gd->playercount < 1) {
 		irc_chanprivmsg (ys_bot, c->name, "\0034Last player removed from Game, Stopping Current Game.");
+		if (YahtzeeServ.verbose) {
+			irc_chanalert (ys_bot, "Last player removed from game in %s, Stopping Game", c->name);
+		}
 		RemoveChannelGameData(c, 0);
 		return;
 	}
