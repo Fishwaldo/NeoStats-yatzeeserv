@@ -235,45 +235,45 @@ void loadyahtzeescores() {
 	char cfgid[255];
 
 	for (ypln = 0; ypln < 10; ypln++) {
-		snprintf(cfgid, 255, "HSON%d", ypln);
+		ircsnprintf(cfgid, 255, "HSON%d", ypln);
 		if (DBAFetchStr ("Scores", cfgid, htsslrnick[ypln], MAXNICK) != NS_SUCCESS) {
 			strlcpy (htsslrnick[ypln], " ", MAXNICK);
 		}
-		snprintf(cfgid, 255, "HSOS%d", ypln);
+		ircsnprintf(cfgid, 255, "HSOS%d", ypln);
 		if (DBAFetchInt ("Scores", cfgid, &htsslr[ypln]) != NS_SUCCESS) {
 			htsslr[ypln] = 0;
 		}
-		snprintf(cfgid, 255, "HSDN%d", ypln);
+		ircsnprintf(cfgid, 255, "HSDN%d", ypln);
 		if (DBAFetchStr ("Scores", cfgid, dhtsslrnick[ypln], MAXNICK) != NS_SUCCESS) {
 			strlcpy (dhtsslrnick[ypln], " ", MAXNICK);
 		}
-		snprintf(cfgid, 255, "HSDS%d", ypln);
+		ircsnprintf(cfgid, 255, "HSDS%d", ypln);
 		if (DBAFetchInt ("Scores", cfgid, &dhtsslr[ypln]) != NS_SUCCESS) {
 			dhtsslr[ypln] = 0;
 		}
-		snprintf(cfgid, 255, "HSWN%d", ypln);
+		ircsnprintf(cfgid, 255, "HSWN%d", ypln);
 		if (DBAFetchStr ("Scores", cfgid, whtsslrnick[ypln], MAXNICK) != NS_SUCCESS) {
 			strlcpy (whtsslrnick[ypln], " ", MAXNICK);
 		}
-		snprintf(cfgid, 255, "HSWS%d", ypln);
+		ircsnprintf(cfgid, 255, "HSWS%d", ypln);
 		if (DBAFetchInt ("Scores", cfgid, &whtsslr[ypln]) != NS_SUCCESS) {
 			whtsslr[ypln] = 0;
 		}
-		snprintf(cfgid, 255, "HSMN%d", ypln);
+		ircsnprintf(cfgid, 255, "HSMN%d", ypln);
 		if (DBAFetchStr ("Scores", cfgid, mhtsslrnick[ypln], MAXNICK) != NS_SUCCESS) {
 			strlcpy (mhtsslrnick[ypln], " ", MAXNICK);
 		}
-		snprintf(cfgid, 255, "HSMS%d", ypln);
+		ircsnprintf(cfgid, 255, "HSMS%d", ypln);
 		if (DBAFetchInt ("Scores", cfgid, &mhtsslr[ypln]) != NS_SUCCESS) {
 			mhtsslr[ypln] = 0;
 		}
 	}
 	for (ypln = 10; ypln < 100; ypln++) {
-		snprintf(cfgid, 255, "HSON%d", ypln);
+		ircsnprintf(cfgid, 255, "HSON%d", ypln);
 		if (DBAFetchStr ("Scores", cfgid, htsslrnick[ypln], MAXNICK) != NS_SUCCESS) {
 			strlcpy (htsslrnick[ypln], " ", MAXNICK);
 		}
-		snprintf(cfgid, 255, "HSOS%d", ypln);
+		ircsnprintf(cfgid, 255, "HSOS%d", ypln);
 		if (DBAFetchInt ("Scores", cfgid, &htsslr[ypln]) != NS_SUCCESS) {
 			htsslr[ypln] = 0;
 		}
@@ -311,9 +311,9 @@ void clearyahtzeemonthly() {
 void saveyahtzeeoverall() {
 	char cfgid[255];
 	for (ypln = 0; ypln < 100; ypln++) {
-		snprintf(cfgid, 255, "HSON%d", ypln);
+		ircsnprintf(cfgid, 255, "HSON%d", ypln);
 		DBAStoreStr ("Scores", cfgid, htsslrnick[ypln], MAXNICK);
-		snprintf(cfgid, 255, "HSOS%d", ypln);
+		ircsnprintf(cfgid, 255, "HSOS%d", ypln);
 		DBAStoreInt ("Scores", cfgid, &htsslr[ypln]);
 	}
 }
@@ -321,27 +321,27 @@ void saveyahtzeeoverall() {
 void saveyahtzeedaily() {
 	char cfgid[255];
 	for (ypln = 0; ypln < 10; ypln++) {
-		snprintf(cfgid, 255, "HSDN%d", ypln);
+		ircsnprintf(cfgid, 255, "HSDN%d", ypln);
 		DBAStoreStr ("Scores", cfgid, dhtsslrnick[ypln], MAXNICK);
-		snprintf(cfgid, 255, "HSDS%d", ypln);
+		ircsnprintf(cfgid, 255, "HSDS%d", ypln);
 		DBAStoreInt ("Scores", cfgid, &dhtsslr[ypln]);
 	}
 }
 void saveyahtzeeweekly() {
 	char cfgid[255];
 	for (ypln = 0; ypln < 10; ypln++) {
-		snprintf(cfgid, 255, "HSWN%d", ypln);
+		ircsnprintf(cfgid, 255, "HSWN%d", ypln);
 		DBAStoreStr ("Scores", cfgid, whtsslrnick[ypln], MAXNICK);
-		snprintf(cfgid, 255, "HSWS%d", ypln);
+		ircsnprintf(cfgid, 255, "HSWS%d", ypln);
 		DBAStoreInt ("Scores", cfgid, &whtsslr[ypln]);
 	}
 }
 void saveyahtzeemonthly() {
 	char cfgid[255];
 	for (ypln = 0; ypln < 10; ypln++) {
-		snprintf(cfgid, 255, "HSMN%d", ypln);
+		ircsnprintf(cfgid, 255, "HSMN%d", ypln);
 		DBAStoreStr ("Scores", cfgid, mhtsslrnick[ypln], MAXNICK);
-		snprintf(cfgid, 255, "HSMS%d", ypln);
+		ircsnprintf(cfgid, 255, "HSMS%d", ypln);
 		DBAStoreInt ("Scores", cfgid, &mhtsslr[ypln]);
 	}
 }

@@ -36,6 +36,7 @@
 				OutputFile="../dev/modules/yahtzeeservd.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="C:\cygwin\home\Mark\nsdev\dev\lib;..\dev\src\Debug"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/yahtzeeserv.pdb"
 				SubSystem="2"
