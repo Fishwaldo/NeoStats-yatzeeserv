@@ -102,10 +102,6 @@ void yrolldie() {
 						}
 						strlcpy(htsslrnick[yplnh], ysplayernick[ypln], MAXNICK);
 						htsslr[yplnh]= ysplayerscore[ypln];
-						u = FindUser(ysplayernick[ypln]);
-						if (u) {
-							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the high score list at position %d", (yplnh + 1));
-						}
 						yplnh= 101;
 					}
 				}
@@ -119,10 +115,6 @@ void yrolldie() {
 						}
 						strlcpy(dhtsslrnick[yplnh], ysplayernick[ypln], MAXNICK);
 						dhtsslr[yplnh]= ysplayerscore[ypln];
-						u = FindUser(ysplayernick[ypln]);
-						if (u) {
-							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the Daily high score list at position %d", (yplnh + 1));
-						}
 						yplnh= 11;
 					}
 				}
@@ -136,10 +128,6 @@ void yrolldie() {
 						}
 						strlcpy(whtsslrnick[yplnh], ysplayernick[ypln], MAXNICK);
 						whtsslr[yplnh]= ysplayerscore[ypln];
-						u = FindUser(ysplayernick[ypln]);
-						if (u) {
-							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the Weekly high score list at position %d", (yplnh + 1));
-						}
 						yplnh= 11;
 					}
 				}
@@ -153,6 +141,40 @@ void yrolldie() {
 						}
 						strlcpy(mhtsslrnick[yplnh], ysplayernick[ypln], MAXNICK);
 						mhtsslr[yplnh]= ysplayerscore[ypln];
+						yplnh= 11;
+					}
+				}
+			}
+			for (ypln = 0; ypln < currentyahtzeeplayercount; ypln++) {
+				for (yplnh = 0; yplnh < 100; yplnh++) {
+					if (ysplayerscore[ypln] == htsslr[yplnh] && !ircstrcasecmp(ysplayernick[ypln], htsslrnick[yplnh])) {
+						u = FindUser(ysplayernick[ypln]);
+						if (u) {
+							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the high score list at position %d", (yplnh + 1));
+						}
+						yplnh= 101;
+					}
+				}
+				for (yplnh = 0; yplnh < 10; yplnh++) {
+					if (ysplayerscore[ypln] == dhtsslr[yplnh] && !ircstrcasecmp(ysplayernick[ypln], dhtsslrnick[yplnh])) {
+						u = FindUser(ysplayernick[ypln]);
+						if (u) {
+							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the Daily high score list at position %d", (yplnh + 1));
+						}
+						yplnh= 11;
+					}
+				}
+				for (yplnh = 0; yplnh < 10; yplnh++) {
+					if (ysplayerscore[ypln] == whtsslr[yplnh] && !ircstrcasecmp(ysplayernick[ypln], whtsslrnick[yplnh])) {
+						u = FindUser(ysplayernick[ypln]);
+						if (u) {
+							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the Weekly high score list at position %d", (yplnh + 1));
+						}
+						yplnh= 11;
+					}
+				}
+				for (yplnh = 0; yplnh < 10; yplnh++) {
+					if (ysplayerscore[ypln] == whtsslr[yplnh] && !ircstrcasecmp(ysplayernick[ypln], whtsslrnick[yplnh])) {
 						u = FindUser(ysplayernick[ypln]);
 						if (u) {
 							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the Monthly high score list at position %d", (yplnh + 1));
@@ -250,63 +272,63 @@ void yscore(char **argvy, int argcy) {
 	for (ypln = 0; ypln < 5; ypln++) {
 		dtsc[ydie[ypln]]++;
 	}
-	if (!ircstrcasecmp(argvy[0], "1")) {
+	if (!ircstrcasecmp(argvy[0], "1") || !ircstrcasecmp(argvy[0], "one")) {
 		scoredthisturn= 0;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][0], "x")) {
 			scoredalready= 1;
 		} else {
 			scoredie(1);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "2")) {
+	} else if (!ircstrcasecmp(argvy[0], "2") || !ircstrcasecmp(argvy[0], "two")) {
 		scoredthisturn= 1;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][1], "x")) {
 			scoredalready= 1;
 		} else {
 			scoredie(2);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "3")) {
+	} else if (!ircstrcasecmp(argvy[0], "3") || !ircstrcasecmp(argvy[0], "three")) {
 		scoredthisturn= 2;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][2], "x")) {
 			scoredalready= 1;
 		} else {
 			scoredie(3);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "4")) {
+	} else if (!ircstrcasecmp(argvy[0], "4") || !ircstrcasecmp(argvy[0], "four")) {
 		scoredthisturn= 3;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][3], "x")) {
 			scoredalready= 1;
 		} else {
 			scoredie(4);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "5")) {
+	} else if (!ircstrcasecmp(argvy[0], "5") || !ircstrcasecmp(argvy[0], "five")) {
 		scoredthisturn= 4;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][4], "x")) {
 			scoredalready= 1;
 		} else {
 			scoredie(5);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "6")) {
+	} else if (!ircstrcasecmp(argvy[0], "6") || !ircstrcasecmp(argvy[0], "six")) {
 		scoredthisturn= 5;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][5], "x")) {
 			scoredalready= 1;
 		} else {
 			scoredie(6);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "fh")) {
+	} else if (!ircstrcasecmp(argvy[0], "fh") || !ircstrcasecmp(argvy[0], "full")) {
 		scoredthisturn= 6;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][6], "x")) {
 			scoredalready= 1;
 		} else {
 			scorefh();
 		}
-	} else if (!ircstrcasecmp(argvy[0], "ss")) {
+	} else if (!ircstrcasecmp(argvy[0], "ss") || !ircstrcasecmp(argvy[0], "short") || !ircstrcasecmp(argvy[0], "small")) {
 		scoredthisturn= 7;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][7], "x")) {
 			scoredalready= 1;
 		} else {
 			scoress();
 		}
-	} else if (!ircstrcasecmp(argvy[0], "ls")) {
+	} else if (!ircstrcasecmp(argvy[0], "ls") || !ircstrcasecmp(argvy[0], "long") || !ircstrcasecmp(argvy[0], "large")) {
 		scoredthisturn= 8;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][8], "x")) {
 			scoredalready= 1;
@@ -327,14 +349,14 @@ void yscore(char **argvy, int argcy) {
 		} else {
 			score4k();
 		}
-	} else if (!ircstrcasecmp(argvy[0], "c")) {
+	} else if (!ircstrcasecmp(argvy[0], "c") || !ircstrcasecmp(argvy[0], "chance")) {
 		scoredthisturn= 11;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][11], "x")) {
 			scoredalready= 1;
 		} else {
 			scorec();
 		}
-	} else if (!ircstrcasecmp(argvy[0], "y")) {
+	} else if (!ircstrcasecmp(argvy[0], "y") || !ircstrcasecmp(argvy[0], "yahtzee")) {
 		scoredthisturn= 12;
 		if (ircstrcasecmp(ysplayerhandused[currentplayer][12], "x")) {
 			scoredalready= 1;
@@ -416,26 +438,16 @@ void reroll(char **argvy, int argcy, char *rolltype) {
 		keepdie[ypln]= kdt2;
 	}
 	buf= joinbuf(argvy, argcy, 0);
-	tstdni= strcasestr(buf, "1");
-	if (!tstdni==NULL) {
+	if (!strchr(buf, 49) == NULL) 
 		keepdie[0]= kdt1;
-	}
-	tstdni= strcasestr(buf, "2");
-	if (!tstdni==NULL) {
+	if (!strchr(buf, 50) == NULL) 
 		keepdie[1]= kdt1;
-	}
-	tstdni= strcasestr(buf, "3");
-	if (!tstdni==NULL) {
+	if (!strchr(buf, 51) == NULL) 
 		keepdie[2]= kdt1;
-	}
-	tstdni= strcasestr(buf, "4");
-	if (!tstdni==NULL) {
+	if (!strchr(buf, 52) == NULL) 
 		keepdie[3]= kdt1;
-	}
-	tstdni= strcasestr(buf, "5");
-	if (!tstdni==NULL) {
+	if (!strchr(buf, 53) == NULL) 
 		keepdie[4]= kdt1;
-	}
 	for (ypln = 0; ypln < 5; ypln++) {
 		if (keepdie[ypln] < 1) {
 			ydie[ypln]= rand() % 6;
