@@ -1,6 +1,5 @@
 /* YahtzeeServ - Yahtzee Game Service - NeoStats Addon Module
-** Copyright (c) 2003-2005 DeadNotBuried
-** Portions Copyright (c) 1999-2005, NeoStats
+** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, DeadNotBuried
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -24,402 +23,569 @@
 #include "neostats.h"    /* Required for bot support */
 #include "yahtzeeserv.h"
 
-/* 
- * Stops Game
- */
-void stopyahtzee() {
-	if (currentyahtzeegamestatus == YS_GAME_STARTING) {
-		DelTimer ("startyahtzee");
+/*
+ * Start Game
+*/
+int StartYahtzeeGame (CmdParams* cmdparams)
+{
+	GameData *gd;
+	Channel *c;
+	
+	if (!cmdparams->channel && !cmdparams->ac) {
+		return NS_SUCCESS;
 	}
-	for (ypln = 0; ypln < 10; ypln++) {
-		strlcpy(ysplayernick[ypln], " ", MAXNICK);
-		ysplayerscore[ypln]= 0;
-		for (yplnh = 0; yplnh < 15; yplnh++) {
-			ysplayerhand[ypln][yplnh]= 0;
+	if (cmdparams->ac) {
+		if (!YahtzeeServ.multichan) {
+			irc_prefmsg (ys_bot, cmdparams->source, "Games outside %s are not currently allowed", YahtzeeServ.yahtzeeroom);
+			return NS_SUCCESS;
 		}
-		for (yplnh = 0; yplnh < 13; yplnh++) {
-			ysplayerhandused[ypln][yplnh]= "x";
+		if (ValidateChannel(cmdparams->av[0]) == NS_FAILURE) {
+			irc_prefmsg (ys_bot, cmdparams->source, "Invalid Channel Name Specified (%s)", cmdparams->av[0]);
+			return NS_SUCCESS;
 		}
+		c = FindChannel(cmdparams->av[0]);
+		if (!c) {
+			irc_prefmsg (ys_bot, cmdparams->source, "%s doesn't currently exist, unable to start.", cmdparams->av[0]);
+			return NS_SUCCESS;
+		}
+		if (IsChannelMember(c, cmdparams->source) == NS_FALSE) {
+			irc_prefmsg (ys_bot, cmdparams->source, "You are not currently in %s. Unable to start.", c->name);
+			return NS_SUCCESS;
+		}
+		if ( YahtzeeServ.chanoponly && !IsChanOp(c->name, cmdparams->source->name)) {
+			irc_prefmsg (ys_bot, cmdparams->source, "Currently only Channel Ops may start games outside the main game channel.");
+			return NS_SUCCESS;
+		}
+		if ((YahtzeeServ.exclusions && IsExcluded(c)) || ModIsChannelExcluded(c)) {
+			irc_prefmsg (ys_bot, cmdparams->source, "%s is currently excluded from Yahtzee games.", c->name);
+			return NS_SUCCESS;
+		}
+	} else {
+		c = cmdparams->channel;
 	}
-	currentyahtzeeplayercount = 0;
-	currentyahtzeegamestatus = YS_GAME_STOPPED;
-	currenthand= 0;
+	gd = (GameData *)GetChannelModValue(c);
+	if (!gd) {
+		CreateChannelGameData(c);
+		gd = (GameData *)GetChannelModValue(c);
+	} else if (gd->gamestatus != YS_GAME_STOPPED) {
+		irc_prefmsg (ys_bot, cmdparams->source, "A game is already running in %s.", c->name);
+		return NS_SUCCESS;	
+	}
+	gd->timer = 25;
+	gd->gamestatus = YS_GAME_STARTING;
+	irc_chanprivmsg (ys_bot, c->name, "\0037Yahtzee has been started by %s. The game will start shortly, type '\2\003!Join\2\0037' to play.", cmdparams->source->name);
+	if (YahtzeeServ.verbose) {
+		irc_chanalert (ys_bot, "Game starting in %s", c->name);
+	}
+	return NS_SUCCESS;
 }
 
-/* 
- * Rolls the First Roll after checking game is not over
- * adds nicks to high score lists if needed,
- * and lets them know if they made a list
- */
-void yrolldie() {
-	Client *u;
-	char *ydiec[5];
-	char *dienums;
-	int ywn, cdthsl, cdthslf, olutt, dlutt, wlutt, mlutt, dcfegisrw;
-
-	ywn= 0;
-	dcfegisrw= 1;
-	olutt= 0;
-	dlutt= 0;
-	wlutt= 0;
-	mlutt= 0;
-	if (currentplayer == 0) {
-		srand((unsigned int)me.now);
-		currenthand++;
-		for (yplnh = 0; yplnh < 13; yplnh++) {
-			if (!ircstrcasecmp(ysplayerhandused[currentplayer][yplnh], "x")) {
-				dcfegisrw= 0;
-			}
-		}
-		if (dcfegisrw > 0) {
-			currenthand= 14;
-		}
-		if (currenthand > 13) {
-			htsslrn= 0;
-			irc_chanprivmsg (ys_bot, yahtzeeroom, "\0038Thats the end of the game folks.");
-			for (ypln = 0; ypln < currentyahtzeeplayercount; ypln++) {
-				if ((ypln != 0) && (ysplayerscore[ypln] > ysplayerscore[ywn])) {
-					ywn= ypln;
-				}
-				irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s\00310 ended with\00311 %d\00310 points.", ysplayernick[ypln], ysplayerscore[ypln]);
-			}
-			irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s \0038is the winner with\00311 %d \0038points.", ysplayernick[ywn], ysplayerscore[ywn]);
-			for (ypln = 0; ypln < currentyahtzeeplayercount; ypln++) {
-				for (yplnh = 0; yplnh < 100; yplnh++) {
-					if (ysplayerscore[ypln] > htsslr[yplnh]) {
-						olutt= 1;
-						if (yplnh == 0) {
-							if (htsslrn == 0) {
-								strlcpy(htsslrnickold, htsslrnick[0], MAXNICK);
-								htsslrold= htsslr[0];
-							}
-							htsslrn= 1;
-						}
-						for (cdthsl = 99; cdthsl > yplnh; cdthsl--) {
-							cdthslf= (cdthsl - 1);
-							strlcpy(htsslrnick[cdthsl], htsslrnick[cdthslf], MAXNICK);
-							htsslr[cdthsl]= htsslr[cdthslf];
-						}
-						strlcpy(htsslrnick[yplnh], ysplayernick[ypln], MAXNICK);
-						htsslr[yplnh]= ysplayerscore[ypln];
-						yplnh= 101;
-					}
-				}
-				for (yplnh = 0; yplnh < 10; yplnh++) {
-					if (ysplayerscore[ypln] > dhtsslr[yplnh]) {
-						dlutt= 1;
-						for (cdthsl = 9; cdthsl > yplnh; cdthsl--) {
-							cdthslf= (cdthsl - 1);
-							strlcpy(dhtsslrnick[cdthsl], dhtsslrnick[cdthslf], MAXNICK);
-							dhtsslr[cdthsl]= dhtsslr[cdthslf];
-						}
-						strlcpy(dhtsslrnick[yplnh], ysplayernick[ypln], MAXNICK);
-						dhtsslr[yplnh]= ysplayerscore[ypln];
-						yplnh= 11;
-					}
-				}
-				for (yplnh = 0; yplnh < 10; yplnh++) {
-					if (ysplayerscore[ypln] > whtsslr[yplnh]) {
-						wlutt= 1;
-						for (cdthsl = 9; cdthsl > yplnh; cdthsl--) {
-							cdthslf= (cdthsl - 1);
-							strlcpy(whtsslrnick[cdthsl], whtsslrnick[cdthslf], MAXNICK);
-							whtsslr[cdthsl]= whtsslr[cdthslf];
-						}
-						strlcpy(whtsslrnick[yplnh], ysplayernick[ypln], MAXNICK);
-						whtsslr[yplnh]= ysplayerscore[ypln];
-						yplnh= 11;
-					}
-				}
-				for (yplnh = 0; yplnh < 10; yplnh++) {
-					if (ysplayerscore[ypln] > mhtsslr[yplnh]) {
-						mlutt= 1;
-						for (cdthsl = 9; cdthsl > yplnh; cdthsl--) {
-							cdthslf= (cdthsl - 1);
-							strlcpy(mhtsslrnick[cdthsl], mhtsslrnick[cdthslf], MAXNICK);
-							mhtsslr[cdthsl]= mhtsslr[cdthslf];
-						}
-						strlcpy(mhtsslrnick[yplnh], ysplayernick[ypln], MAXNICK);
-						mhtsslr[yplnh]= ysplayerscore[ypln];
-						yplnh= 11;
-					}
-				}
-			}
-			for (ypln = 0; ypln < currentyahtzeeplayercount; ypln++) {
-				for (yplnh = 0; yplnh < 100; yplnh++) {
-					if (ysplayerscore[ypln] == htsslr[yplnh] && !ircstrcasecmp(ysplayernick[ypln], htsslrnick[yplnh])) {
-						u = FindUser(ysplayernick[ypln]);
-						if (u) {
-							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the high score list at position %d", (yplnh + 1));
-						}
-						yplnh= 101;
-					}
-				}
-				for (yplnh = 0; yplnh < 10; yplnh++) {
-					if (ysplayerscore[ypln] == dhtsslr[yplnh] && !ircstrcasecmp(ysplayernick[ypln], dhtsslrnick[yplnh])) {
-						u = FindUser(ysplayernick[ypln]);
-						if (u) {
-							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the Daily high score list at position %d", (yplnh + 1));
-						}
-						yplnh= 11;
-					}
-				}
-				for (yplnh = 0; yplnh < 10; yplnh++) {
-					if (ysplayerscore[ypln] == whtsslr[yplnh] && !ircstrcasecmp(ysplayernick[ypln], whtsslrnick[yplnh])) {
-						u = FindUser(ysplayernick[ypln]);
-						if (u) {
-							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the Weekly high score list at position %d", (yplnh + 1));
-						}
-						yplnh= 11;
-					}
-				}
-				for (yplnh = 0; yplnh < 10; yplnh++) {
-					if (ysplayerscore[ypln] == whtsslr[yplnh] && !ircstrcasecmp(ysplayernick[ypln], whtsslrnick[yplnh])) {
-						u = FindUser(ysplayernick[ypln]);
-						if (u) {
-							irc_prefmsg (ys_bot, u, "Congratulations, You are now on the Monthly high score list at position %d", (yplnh + 1));
-						}
-						yplnh= 11;
-					}
-				}
-			}
-			if (htsslrn == 1) {
-				irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s \0038now has the highest score, with\00311 %d \0038points, overtaking \0037%s\0038 who had\00311 %d \0038points.", htsslrnick[0], htsslr[0], htsslrnickold, htsslrold);
+/*
+ * Timer Procedure
+ * checks for starting games
+ * if game if due to start, checks for joined users
+ * if users joined starts game, if not end game.
+*/
+int yahtzeetimer(void) {
+	lnode_t *ln, *ln2;
+	GameData *gd;
+	Channel *c;
+	
+	ln = list_first(gamelist);
+	while (ln != NULL) {
+		c = lnode_get(ln);
+		gd = (GameData *)GetChannelModValue(c);
+		if (!gd) {
+			ln2 = list_next(gamelist, ln);
+			list_delete(gamelist, ln);
+			lnode_destroy(ln);
+			ln = ln2;
+		} else if (gd->gamestatus == YS_GAME_STARTING) {
+			if (gd->timer > 4) {
+				gd->timer -= 5;
+				ln = list_next(gamelist, ln);
 			} else {
-				irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s \0038still has the highest score, with\00311 %d \0038points.", htsslrnick[0], htsslr[0]);
+				gd->timer = 0;
+				if (gd->playercount < 1) {
+					irc_chanprivmsg (ys_bot, c->name, "\0034No Players joined to current Game, Exiting");
+					if (YahtzeeServ.verbose) {
+						irc_chanalert (ys_bot, "No Players Joined Game In %s, exiting", c->name);
+					}
+					ln2 = list_next(gamelist, ln);
+					lnode_destroy(ln);
+					ln = ln2;
+					RemoveChannelGameData(c, 0);
+				} else {
+					irc_chanprivmsg (ys_bot, c->name, "\00310Yahtzee is now starting, current players are \0037%s %s %s %s %s %s %s %s %s %s", gd->pd[0]->u ? gd->pd[0]->u->name : "", gd->pd[1]->u ? gd->pd[1]->u->name : "", gd->pd[2]->u ? gd->pd[2]->u->name : "", gd->pd[3]->u ? gd->pd[3]->u->name : "", gd->pd[4]->u ? gd->pd[4]->u->name : "", gd->pd[5]->u ? gd->pd[5]->u->name : "", gd->pd[6]->u ? gd->pd[6]->u->name : "", gd->pd[7]->u ? gd->pd[7]->u->name : "", gd->pd[8]->u ? gd->pd[8]->u->name : "", gd->pd[9]->u ? gd->pd[9]->u->name : "");
+					if (YahtzeeServ.verbose) {
+						irc_chanalert (ys_bot, "Game started in %s, with %d players", c->name, gd->playercount);
+					}
+					gd->gamestatus = YS_GAME_PLAYING;
+					gd->currenthand = 1;
+					RollDice(c);
+					ln = list_next(gamelist, ln);
+				}
+
 			}
-			htsslrn= 0;
-			stopyahtzee();
-			if (olutt == 1) {
-				saveyahtzeeoverall();
-			}
-			if (dlutt == 1) {
-				saveyahtzeedaily();
-			}
-			if (wlutt == 1) {
-				saveyahtzeeweekly();
-			}
-			if (mlutt == 1) {
-				saveyahtzeemonthly();
-			}
-			return;
+		} else {
+			ln = list_next(gamelist, ln);
 		}
 	}
-	for (ypln = 0; ypln < 5; ypln++) {
-		ydie[ypln]= rand() % 6;
-		if (ydie[ypln] == 0) {
-			ydiec[ypln]= "\0034One\003";
-		} else if (ydie[ypln] == 1) {
-			ydiec[ypln]= "\0034Two\003";
-		} else if (ydie[ypln] == 2) {
-			ydiec[ypln]= "\0034Three\003";
-		} else if (ydie[ypln] == 3) {
-			ydiec[ypln]= "\0034Four\003";
-		} else if (ydie[ypln] == 4) {
-			ydiec[ypln]= "\0034Five\003";
-		} else if (ydie[ypln] == 5) {
-			ydiec[ypln]= "\0034Six\003";
-		}
-	}
-	dienums= joinbuf(ydiec, 5, 0);
-	currentroll= 1;
-	irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s\0039 this is roll\00311 %d\0039, you rolled\00311 %s", ysplayernick[currentplayer], currentroll, dienums);
+	return NS_SUCCESS;
 }
 
-/* 
- * Gets Current Roll and set variables
- */
-void getdieroll() {
-	char *ydiec[5];
-	char *dienums;
-	for (ypln = 0; ypln < 5; ypln++) {
-		if (ydie[ypln] == 0) {
-			ydiec[ypln]= "\0034One\003";
-		} else if (ydie[ypln] == 1) {
-			ydiec[ypln]= "\0034Two\003";
-		} else if (ydie[ypln] == 2) {
-			ydiec[ypln]= "\0034Three\003";
-		} else if (ydie[ypln] == 3) {
-			ydiec[ypln]= "\0034Four\003";
-		} else if (ydie[ypln] == 4) {
-			ydiec[ypln]= "\0034Five\003";
-		} else if (ydie[ypln] == 5) {
-			ydiec[ypln]= "\0034Six\003";
+/*
+ * Join Player To Game
+*/
+int JoinYahtzeeGame (CmdParams* cmdparams) {
+	GameData *gd;
+	int i;
+	
+	gd = (GameData *)GetChannelModValue(cmdparams->channel);
+	if (!gd) {
+		return NS_SUCCESS;
+	}
+	if (gd->gamestatus == YS_GAME_STARTING || (gd->gamestatus == YS_GAME_PLAYING && gd->currenthand < 2)) {
+		if (gd->playercount < YS_MAX_PLAYERS) {
+			for (i = 0; i < gd->playercount; i++) {
+				if (gd->pd[i]->u == cmdparams->source) {
+					return NS_SUCCESS;
+				}
+			}
+			gd->pd[gd->playercount]->u = cmdparams->source;
+			gd->pd[gd->playercount]->score = 0;
+			for (i=0;i<15;i++) {
+				gd->pd[gd->playercount]->hand[i] = -1;
+			}
+			gd->playercount++;
+			if (!GetUserModValue(cmdparams->source)) {
+				SetUserModValue(cmdparams->source,1);
+			} else {
+				SetUserModValue(cmdparams->source,(GetUserModValue(cmdparams->source) + 1));
+			}
+			irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0038Welcome to Yahtzee \0037%s", cmdparams->source->name);
+		} else {
+			irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0034Sorry all places are filled \0037%s\0034, your welcome to try the next game though", cmdparams->source->name);
 		}
 	}
-	tmpstr= joinbuf(ydiec, 5, 0);
+	return NS_SUCCESS;
 }
 
-/* 
- * Gets Current Roll and set variables
- */
-void yscore(char **argvy, int argcy) {
-	int tstbonus;
-	int scoredthisturn;
-	int scoredalready;
-	scoredalready= 0;
-	if ( argcy < 1 ) {
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\0034Sorry\0037 %s\0034, thats not a valid score slot, please use one of the following", ysplayernick[currentplayer]);
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\00311One's (1) , Two's (2) , Three's (3) , Four's (4) , Five's (5) , Six's (6)");
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\00311Full House (FH) , Short Straight (SS) , Long Straight (LS)");
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\00311Three of a Kind (3K) , Four of a Kind (4K) , Chance (C) , Yahtzee (Y)");
+/*
+ * Remove Player
+*/
+int RemoveYahtzeeGame (CmdParams* cmdparams)
+{
+	Client *u;
+
+	if (cmdparams->ac > 0 && (cmdparams->source->user->ulevel >= NS_ULEVEL_LOCOPER || IsChanOp(cmdparams->channel->name, cmdparams->source->name))) {
+		u = FindUser(cmdparams->av[0]);
+		if (!u) {
+			return NS_SUCCESS;
+		}
+	} else {
+		u = cmdparams->source;
+	}
+	removenickfromgame(cmdparams->channel, u);
+	return NS_SUCCESS;
+}
+
+/*
+ * Removes User From Game In Channel
+*/
+void removenickfromgame(Channel *c, Client *u) {
+	GameData *gd;
+	int i, i2, i3, rp;
+
+	if (!GetUserModValue(u)) {
 		return;
 	}
-	crs= 0;
-	for (ypln = 0; ypln < 6; ypln++) {
-		dtsc[ypln]= 0;
+	gd = (GameData *)GetChannelModValue(c);
+	if (!gd) {
+		return;
 	}
-	for (ypln = 0; ypln < 5; ypln++) {
-		dtsc[ydie[ypln]]++;
+	if (gd->playercount < 1) {
+		return;
 	}
-	if (!ircstrcasecmp(argvy[0], "1") || !ircstrcasecmp(argvy[0], "one")) {
-		scoredthisturn= 0;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][0], "x")) {
-			scoredalready= 1;
-		} else {
-			scoredie(1);
+	if (gd->gamestatus != YS_GAME_STARTING && gd->gamestatus != YS_GAME_PLAYING) {
+		return;
+	}
+	rp = 0;
+	for (i = 0 ; i < gd->playercount ; i++) {
+		if (gd->pd[i]->u == u) {
+			if (GetUserModValue(u) > 0) {
+				SetUserModValue(u,(GetUserModValue(u) - 1));
+			}
+			for (i2 = i ; i2 < gd->playercount ; i2++) {
+				if (i2 < (gd->playercount - 1)) {
+					gd->pd[i2]->u = gd->pd[(i2 + 1)]->u;
+					gd->pd[i2]->score = gd->pd[(i2 + 1)]->score;
+					for (i3 = 0 ; i3 < 15 ; i3++) {
+						gd->pd[i2]->hand[13] = gd->pd[(i2 + 1)]->hand[i3];
+					}
+				} else {
+					gd->pd[i2]->u = NULL;
+				}
+			}
+			gd->playercount--;
+			if (gd->gamestatus == YS_GAME_PLAYING) {
+				if (i < gd->currentplayer) {
+					gd->currentplayer--;
+				} else if (i == gd->currentplayer) {
+					gd->currentroll = 0;
+					if (i == gd->playercount) {
+						gd->currenthand++;
+						gd->currentplayer = 0;
+					}
+				}
+			}
+			if (!rp) {
+				irc_chanprivmsg (ys_bot, c->name, "\0037%s \0038Removed from the current game of Yahtzee", u->name);
+			}
+			rp++;
+			i--;
 		}
-	} else if (!ircstrcasecmp(argvy[0], "2") || !ircstrcasecmp(argvy[0], "two")) {
-		scoredthisturn= 1;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][1], "x")) {
-			scoredalready= 1;
+	}
+	if (gd->playercount < 1) {
+		irc_chanprivmsg (ys_bot, c->name, "\0034Last player removed from Game, Stopping Current Game.");
+		RemoveChannelGameData(c, 0);
+		return;
+	}
+	if (gd->gamestatus == YS_GAME_PLAYING && !gd->currentroll) {
+		RollDice(c);
+		return;
+	}
+	return;
+}
+
+/*
+ * Stop Game
+*/
+int StopYahtzeeGame (CmdParams* cmdparams)
+{
+	GameData *gd;
+
+	if (!GetUserModValue(cmdparams->source) && cmdparams->source->user->ulevel < NS_ULEVEL_LOCOPER && !IsChanOp(cmdparams->channel->name, cmdparams->source->name)) {
+		return NS_SUCCESS;
+	}
+	gd = (GameData *)GetChannelModValue(cmdparams->channel);
+	if (!gd) {
+		return NS_SUCCESS;
+	}
+	if (gd->gamestatus != YS_GAME_STARTING && gd->gamestatus != YS_GAME_PLAYING) {
+		return NS_SUCCESS;
+	}
+	if (gd->playercount != 1 && cmdparams->source->user->ulevel < NS_ULEVEL_LOCOPER && !IsChanOp(cmdparams->channel->name, cmdparams->source->name)) {
+		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0034Unable to stop Yahtzee when more than one person playing, please use !remove if you wish to exit the game \0037%s.", cmdparams->source->name);
+		return NS_SUCCESS;
+	}
+	irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0034Yahtzee has been stopped by \0037%s.", cmdparams->source->name);
+	if (YahtzeeServ.verbose) {
+		irc_chanalert (ys_bot, "Game stopped in %s by %s", cmdparams->channel->name, cmdparams->source->name);
+	}
+	RemoveChannelGameData(cmdparams->channel, 0);
+	return NS_SUCCESS;
+}
+
+/*
+ * Score to Sheet
+*/
+int ScoreYahtzeeDice (CmdParams* cmdparams)
+{
+	GameData *gd;
+	int i, crs, sa, stt;
+
+	if (!GetUserModValue(cmdparams->source)) {
+		return NS_SUCCESS;
+	}
+	gd = (GameData *)GetChannelModValue(cmdparams->channel);
+	if (!gd) {
+		return NS_SUCCESS;
+	}
+	if (gd->playercount < 1) {
+		return NS_SUCCESS;
+	}
+	if (gd->gamestatus != YS_GAME_PLAYING) {
+		return NS_SUCCESS;
+	}
+	if (gd->pd[gd->currentplayer]->u != cmdparams->source) {
+		return NS_SUCCESS;
+	}
+	for (i = 0; i < 6; i++) {
+		dtsc[i]= 0;
+	}
+	for (i = 0; i < 5; i++) {
+		dtsc[gd->dice[i]]++;
+	}
+	crs = sa = 0;
+	if (!ircstrcasecmp(cmdparams->av[0], "1") || !ircstrcasecmp(cmdparams->av[0], "one")) {
+		stt= 0;
+		if (gd->pd[gd->currentplayer]->hand[0] >= 0) {
+			sa= 1;
 		} else {
-			scoredie(2);
+			crs = dtsc[0];
 		}
-	} else if (!ircstrcasecmp(argvy[0], "3") || !ircstrcasecmp(argvy[0], "three")) {
-		scoredthisturn= 2;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][2], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "2") || !ircstrcasecmp(cmdparams->av[0], "two")) {
+		stt= 1;
+		if (gd->pd[gd->currentplayer]->hand[1] >= 0) {
+			sa= 1;
 		} else {
-			scoredie(3);
+			crs = (dtsc[1] * 2);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "4") || !ircstrcasecmp(argvy[0], "four")) {
-		scoredthisturn= 3;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][3], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "3") || !ircstrcasecmp(cmdparams->av[0], "three")) {
+		stt= 2;
+		if (gd->pd[gd->currentplayer]->hand[2] >= 0) {
+			sa= 1;
 		} else {
-			scoredie(4);
+			crs = (dtsc[2] * 3);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "5") || !ircstrcasecmp(argvy[0], "five")) {
-		scoredthisturn= 4;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][4], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "4") || !ircstrcasecmp(cmdparams->av[0], "four")) {
+		stt= 3;
+		if (gd->pd[gd->currentplayer]->hand[3] >= 0) {
+			sa= 1;
 		} else {
-			scoredie(5);
+			crs = (dtsc[3] * 4);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "6") || !ircstrcasecmp(argvy[0], "six")) {
-		scoredthisturn= 5;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][5], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "5") || !ircstrcasecmp(cmdparams->av[0], "five")) {
+		stt= 4;
+		if (gd->pd[gd->currentplayer]->hand[4] >= 0) {
+			sa= 1;
 		} else {
-			scoredie(6);
+			crs = (dtsc[4] * 5);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "fh") || !ircstrcasecmp(argvy[0], "full")) {
-		scoredthisturn= 6;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][6], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "6") || !ircstrcasecmp(cmdparams->av[0], "six")) {
+		stt= 5;
+		if (gd->pd[gd->currentplayer]->hand[5] >= 0) {
+			sa= 1;
 		} else {
-			scorefh();
+			crs = (dtsc[5] * 6);
 		}
-	} else if (!ircstrcasecmp(argvy[0], "ss") || !ircstrcasecmp(argvy[0], "short") || !ircstrcasecmp(argvy[0], "small")) {
-		scoredthisturn= 7;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][7], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "fh") || !ircstrcasecmp(cmdparams->av[0], "full")) {
+		stt= 6;
+		if (gd->pd[gd->currentplayer]->hand[6] >= 0) {
+			sa= 1;
 		} else {
-			scoress();
+			for (i = 0; i < 6; i++) {
+				if ((dtsc[i] == 2) || (dtsc[i] == 3)) {
+					crs++;
+				} else if (dtsc[i] == 1) {
+					crs--;
+				}
+			}
+			if (crs == 2) {
+				crs = 25;
+			} else {
+				crs = 0;
+			}
 		}
-	} else if (!ircstrcasecmp(argvy[0], "ls") || !ircstrcasecmp(argvy[0], "long") || !ircstrcasecmp(argvy[0], "large")) {
-		scoredthisturn= 8;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][8], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "ss") || !ircstrcasecmp(cmdparams->av[0], "short") || !ircstrcasecmp(cmdparams->av[0], "small")) {
+		stt= 7;
+		if (gd->pd[gd->currentplayer]->hand[7] >= 0) {
+			sa= 1;
 		} else {
-			scorels();
+			for (i = 0; i < 6; i++) {
+				if (dtsc[i] == 0) {
+					if (crs < 4) {
+						crs= 0;
+					}
+				} else {
+					crs++;
+				}
+			}
+			if (crs > 3) {
+				crs = 30;
+			} else {
+				crs = 0;
+			}
 		}
-	} else if (!ircstrcasecmp(argvy[0], "3k")) {
-		scoredthisturn= 9;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][9], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "ls") || !ircstrcasecmp(cmdparams->av[0], "long") || !ircstrcasecmp(cmdparams->av[0], "large")) {
+		stt= 8;
+		if (gd->pd[gd->currentplayer]->hand[8] >= 0) {
+			sa= 1;
 		} else {
-			score3k();
+			if ((dtsc[1] == 1) && (dtsc[2] == 1) && (dtsc[3] == 1) && (dtsc[4] == 1)) {
+				crs = 40;
+			}
 		}
-	} else if (!ircstrcasecmp(argvy[0], "4k")) {
-		scoredthisturn= 10;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][10], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "3k")) {
+		stt= 9;
+		if (gd->pd[gd->currentplayer]->hand[9] >= 0) {
+			sa= 1;
 		} else {
-			score4k();
+			for (i = 0; i < 6; i++) {
+				if (dtsc[i] > 2) {
+					crs = 1;
+				}
+			}
+			if (crs) {
+				crs = 0;
+				for (i = 0; i < 6; i++) {
+					crs += (dtsc[i] * (i + 1));
+				}
+			}
 		}
-	} else if (!ircstrcasecmp(argvy[0], "c") || !ircstrcasecmp(argvy[0], "chance")) {
-		scoredthisturn= 11;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][11], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "4k")) {
+		stt= 10;
+		if (gd->pd[gd->currentplayer]->hand[10] >= 0) {
+			sa= 1;
 		} else {
-			scorec();
+			for (i = 0; i < 6; i++) {
+				if (dtsc[i] > 3) {
+					crs = 1;
+				}
+			}
+			if (crs) {
+				crs = 0;
+				for (i = 0; i < 6; i++) {
+					crs += (dtsc[i] * (i + 1));
+				}
+			}
 		}
-	} else if (!ircstrcasecmp(argvy[0], "y") || !ircstrcasecmp(argvy[0], "yahtzee")) {
-		scoredthisturn= 12;
-		if (ircstrcasecmp(ysplayerhandused[currentplayer][12], "x")) {
-			scoredalready= 1;
+	} else if (!ircstrcasecmp(cmdparams->av[0], "c") || !ircstrcasecmp(cmdparams->av[0], "chance")) {
+		stt= 11;
+		if (gd->pd[gd->currentplayer]->hand[11] >= 0) {
+			sa= 1;
 		} else {
-			scorey();
-			if (crs == 50) {
-				ysplayerhand[currentplayer][12] = 9999;
+			for (i = 0; i < 6; i++) {
+				crs += (dtsc[i] * (i + 1));
+			}
+		}
+	} else if (!ircstrcasecmp(cmdparams->av[0], "y") || !ircstrcasecmp(cmdparams->av[0], "yahtzee")) {
+		stt= 12;
+		if (gd->pd[gd->currentplayer]->hand[12] >= 0) {
+			sa= 1;
+		} else {
+			for (i = 0; i < 6; i++) {
+				if (dtsc[i] == 5) {
+					crs = 50;
+				}
 			}
 		}
 	} else {
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\0034Sorry\0037 %s\0034, thats not a valid score slot, please use one of the following", ysplayernick[currentplayer]);
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\00311One's (1) , Two's (2) , Three's (3) , Four's (4) , Five's (5) , Six's (6)");
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\00311Full House (FH) , Short Straight (SS) , Long Straight (LS)");
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\00311Three of a Kind (3K) , Four of a Kind (4K) , Chance (C) , Yahtzee (Y)");
+		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0034Sorry\0037 %s\0034, thats not a valid score slot, please use one of the following", cmdparams->source->name);
+		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\00311One's (1) , Two's (2) , Three's (3) , Four's (4) , Five's (5) , Six's (6)");
+		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\00311Full House (FH) , Short Straight (SS) , Long Straight (LS)");
+		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\00311Three of a Kind (3K) , Four of a Kind (4K) , Chance (C) , Yahtzee (Y)");
+		return NS_SUCCESS;
+	}
+	if (sa == 1) {
+		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0034Sorry\0037 %s\0034 you have already scored on \00311%s", cmdparams->source->name, ysscoretype[stt]);
+		return NS_SUCCESS;
+	}
+	gd->pd[gd->currentplayer]->hand[stt] = crs;
+	irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0037%s\0039 scored\00311 %d\0039 on \00311%s", cmdparams->source->name, crs, ysscoretype[stt]);
+	gd->pd[gd->currentplayer]->score += crs;
+	if (stt != 12 && gd->pd[gd->currentplayer]->hand[12] == 50 && crs) {
+		for (i = 0; i < 6; i++) {
+			if (dtsc[i] == 5) {
+				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0037%s\0039 scored\00311 100 \0038Yahtzee Bonus \0039points", cmdparams->source->name);
+				if (gd->pd[gd->currentplayer]->hand[14] < 0) {
+					gd->pd[gd->currentplayer]->hand[14] = 100;
+				} else {
+					gd->pd[gd->currentplayer]->hand[14] += 100;
+				}
+				gd->pd[gd->currentplayer]->score += 100;
+			}
+		}
+	}
+	if (gd->pd[gd->currentplayer]->hand[13] < 0) {
+		crs = 0;
+		for (i = 0; i < 6; i++) {
+			crs += gd->pd[gd->currentplayer]->hand[i];
+		}
+		if (crs > 62) {
+			irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0037%s\0039 scored a \0038Bonus\00311 35 \0039points", cmdparams->source->name);
+			crs = 35;
+			gd->pd[gd->currentplayer]->hand[13] = crs;
+			gd->pd[gd->currentplayer]->score += crs;
+		}
+	}
+	irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0037%s\0039 now has a total of\00311 %d\0039 points", cmdparams->source->name, gd->pd[gd->currentplayer]->score);
+	gd->currentplayer++;
+	if (gd->currentplayer >= gd->playercount) {
+		gd->currentplayer = 0;
+		gd->currenthand++;
+	}
+	gd->currentroll= 0;
+	RollDice(cmdparams->channel);
+	return NS_SUCCESS;
+}
+
+/*
+ * Check if Game over, if not First Dice Roll
+*/
+void RollDice(Channel *c) {
+	GameData *gd;
+	int i, ywn;
+
+	ywn = 0;
+	gd = (GameData *)GetChannelModValue(c);
+	if (!gd) {
 		return;
 	}
-	if (scoredalready == 1) {
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\0034Sorry\0037 %s\0034 you have already scored on \00311%s", ysplayernick[currentplayer], ysscoretype[scoredthisturn]);
-		return;
-	}
-	ysplayerhandused[currentplayer][scoredthisturn]= "";
-	if (scoredthisturn != 12) {
-		ysplayerhand[currentplayer][scoredthisturn] = crs;
-	}
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s\0039 scored\00311 %d\0039 on \00311%s", ysplayernick[currentplayer], crs, ysscoretype[scoredthisturn]);
-	if (ysplayerhand[currentplayer][13] < 1) {
-		tstbonus= 0;
-		for (yplnh = 0; yplnh < 6; yplnh++) {
-			tstbonus += ysplayerhand[currentplayer][yplnh];
-		}
-		if (tstbonus > 62) {
-			irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s\0039 scored a \0038Bonus\00311 35 \0039points", ysplayernick[currentplayer]);
-			crs += 35;
-			ysplayerhand[currentplayer][13]= 35;
-			ysplayerhandused[currentplayer][13]= "";
+	if (gd->currentplayer == 0) {
+		srand((unsigned int)me.now);
+		if (gd->currenthand > 13) {
+			irc_chanprivmsg (ys_bot, c->name, "\0038Thats the end of the game folks.");
+			for (i = 0; i < gd->playercount; i++) {
+				if ((i != 0) && (gd->pd[i]->score > gd->pd[ywn]->score)) {
+					ywn= i;
+				}
+				irc_chanprivmsg (ys_bot, c->name, "\0037%s\00310 ended with\00311 %d\00310 points.", gd->pd[i]->u->name, gd->pd[i]->score);
+			}
+			irc_chanprivmsg (ys_bot, c->name, "\0037%s \0038is the winner with\00311 %d \0038points.", gd->pd[ywn]->u->name, gd->pd[ywn]->score);
+			checkhighscorelists(c);
+			if (YahtzeeServ.verbose) {
+				irc_chanalert (ys_bot, "Game in %s, completed sucessfully", c->name);
+			}
+			RemoveChannelGameData(c, 0);
+			return;
 		}
 	}
-	if ((ysplayerhand[currentplayer][12] == 50) && (crs > 0)) {
-		if ( (ydie[0] == ydie[1]) && (ydie[0] == ydie[2]) && (ydie[0] == ydie[3]) && (ydie[0] == ydie[4])) {
-			irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s\0039 scored a \0038Bonus\00311 100 \0039points", ysplayernick[currentplayer]);
-			crs += 100;
-			ysplayerhand[currentplayer][14] += 100;
-			ysplayerhandused[currentplayer][14]= "";
+	for (i = 0; i < 5; i++) {
+		gd->dice[i]= rand() % 6;
+		if (gd->dice[i] == 0) {
+			strlcpy(dicetext[i], "One", 15);
+		} else if (gd->dice[i] == 1) {
+			strlcpy(dicetext[i], "Two", 15);
+		} else if (gd->dice[i] == 2) {
+			strlcpy(dicetext[i], "Three", 15);
+		} else if (gd->dice[i] == 3) {
+			strlcpy(dicetext[i], "Four", 15);
+		} else if (gd->dice[i] == 4) {
+			strlcpy(dicetext[i], "Five", 15);
+		} else if (gd->dice[i] == 5) {
+			strlcpy(dicetext[i], "Six", 15);
 		}
 	}
-	if (ysplayerhand[currentplayer][12] == 9999) {
-		ysplayerhand[currentplayer][12] = 50;
-	}
-	ysplayerscore[currentplayer] += crs;
-	irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s\0039 now has a total of\00311 %d\0039 points", ysplayernick[currentplayer], ysplayerscore[currentplayer]);
-	currentplayer++;
-	if (currentplayer > (currentyahtzeeplayercount - 1)) {
-		currentplayer= 0;
-	}
-	currentroll= 0;
-	yrolldie();
+	gd->currentroll = 1;
+	irc_chanprivmsg (ys_bot, c->name, "\0037%s\0039 this is roll\00311 %d\0039, you rolled\0034 %s %s %s %s %s", gd->pd[gd->currentplayer]->u->name, gd->currentroll, dicetext[0], dicetext[1], dicetext[2], dicetext[3], dicetext[4]);
 	return;
+}
+
+/*
+ * Roll Dice
+*/
+int RollYahtzeeDice (CmdParams* cmdparams)
+{
+	reroll(cmdparams, 1);
+	return NS_SUCCESS;
+}
+
+/*
+ * Keep Dice
+*/
+int KeepYahtzeeDice (CmdParams* cmdparams)
+{
+	reroll(cmdparams, 0);
+	return NS_SUCCESS;
 }
 
 /* 
  * ReRolls Selected Dice
- */
-void reroll(char **argvy, int argcy, char *rolltype) {
+*/
+void reroll(CmdParams* cmdparams, int rolltype) {
+	GameData *gd;
 	char *ydiec[5];
 	char *dienums;
 	int keepdie[5];
@@ -427,155 +593,53 @@ void reroll(char **argvy, int argcy, char *rolltype) {
 	char *buf;
 	int kdt1;
 	int kdt2;
-	if (!ircstrcasecmp(rolltype, "roll")) {
-		kdt1= 0;
-		kdt2= 1;
-	} else {
-		kdt1= 1;
-		kdt2= 0;
+
+	int i, dc;
+	
+	if (!GetUserModValue(cmdparams->source)) {
+		return;
 	}
-	for (ypln = 0; ypln < 5; ypln++) {
-		keepdie[ypln]= kdt2;
+	gd = (GameData *)GetChannelModValue(cmdparams->channel);
+	if (!gd) {
+		return;
 	}
-	buf= joinbuf(argvy, argcy, 0);
-	if (!strchr(buf, 49) == NULL) 
-		keepdie[0]= kdt1;
-	if (!strchr(buf, 50) == NULL) 
-		keepdie[1]= kdt1;
-	if (!strchr(buf, 51) == NULL) 
-		keepdie[2]= kdt1;
-	if (!strchr(buf, 52) == NULL) 
-		keepdie[3]= kdt1;
-	if (!strchr(buf, 53) == NULL) 
-		keepdie[4]= kdt1;
-	for (ypln = 0; ypln < 5; ypln++) {
-		if (keepdie[ypln] < 1) {
-			ydie[ypln]= rand() % 6;
-			if (ydie[ypln] == 0) {
-				ydiec[ypln]= "\0034One\003";
-			} else if (ydie[ypln] == 1) {
-				ydiec[ypln]= "\0034Two\003";
-			} else if (ydie[ypln] == 2) {
-				ydiec[ypln]= "\0034Three\003";
-			} else if (ydie[ypln] == 3) {
-				ydiec[ypln]= "\0034Four\003";
-			} else if (ydie[ypln] == 4) {
-				ydiec[ypln]= "\0034Five\003";
-			} else if (ydie[ypln] == 5) {
-				ydiec[ypln]= "\0034Six\003";
-			}
+	if (gd->pd[gd->currentplayer]->u != cmdparams->source) {
+		return;
+	}
+	if (gd->gamestatus != YS_GAME_PLAYING) {
+		return;
+	}
+	if (gd->currentroll < 1 || gd->currentroll > 2) {
+		return;
+	}
+	buf= joinbuf(cmdparams->av, cmdparams->ac, 0);
+	strip_mirc_codes(buf);
+	for (i = 0; i < 5; i++) {
+		if ((!strchr(buf, (i + 49)) == NULL && rolltype) || (strchr(buf, (i + 49)) == NULL && !rolltype)) {
+			gd->dice[i]= rand() % 6;
+			dc = 4;
 		} else {
-			if (ydie[ypln] == 0) {
-				ydiec[ypln]= "\00311One\003";
-			} else if (ydie[ypln] == 1) {
-				ydiec[ypln]= "\00311Two\003";
-			} else if (ydie[ypln] == 2) {
-				ydiec[ypln]= "\00311Three\003";
-			} else if (ydie[ypln] == 3) {
-				ydiec[ypln]= "\00311Four\003";
-			} else if (ydie[ypln] == 4) {
-				ydiec[ypln]= "\00311Five\003";
-			} else if (ydie[ypln] == 5) {
-				ydiec[ypln]= "\00311Six\003";
-			}
+			dc = 11;
+		}
+		if (gd->dice[i] == 0) {
+			ircsnprintf(dicetext[i], 15, "\003%dOne", dc);
+		} else if (gd->dice[i] == 1) {
+			ircsnprintf(dicetext[i], 15, "\003%dTwo", dc);
+		} else if (gd->dice[i] == 2) {
+			ircsnprintf(dicetext[i], 15, "\003%dThree", dc);
+		} else if (gd->dice[i] == 3) {
+			ircsnprintf(dicetext[i], 15, "\003%dFour", dc);
+		} else if (gd->dice[i] == 4) {
+			ircsnprintf(dicetext[i], 15, "\003%dFive", dc);
+		} else if (gd->dice[i] == 5) {
+			ircsnprintf(dicetext[i], 15, "\003%dSix", dc);
 		}
 	}
-	dienums= joinbuf(ydiec, 5, 0);
-	currentroll++;
-	irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037%s\0039 this is roll\00311 %d\0039, you rolled\00311 %s", ysplayernick[currentplayer], currentroll, dienums);
-	if (currentroll == 3) {
-		irc_chanprivmsg (ys_bot, yahtzeeroom, "\0039That was your last roll this turn\0037 %s\0039, select which score to take", ysplayernick[currentplayer]);
+	gd->currentroll++;
+	irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0037%s\0039 this is roll\00311 %d\0039, you rolled %s %s %s %s %s", cmdparams->source->name, gd->currentroll, dicetext[0], dicetext[1], dicetext[2], dicetext[3], dicetext[4]);
+	if (gd->currentroll == 3) {
+		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039That was your last roll this turn\0037 %s\0039, select which score to take", cmdparams->source->name);
 	}
-}
-
-/*
- * Start Game
-*/
-
-void startcountdowntimer(char *nic) {
-	currentyahtzeegamestatus = YS_GAME_STARTING;
-	irc_chanprivmsg (ys_bot, yahtzeeroom, "\0037A new game of Yahtzee has been started by %s. Game will start in 30 seconds, type '\2\003!Join\2\0037' to play.", nic);
-	AddTimer (TIMER_TYPE_COUNTDOWN, startyahtzee, "startyahtzee", 30);
-
-}
-
-/* 
- * Check Scores
- */
-void scoredie(int sconum) {
-	for (ypln = 0; ypln < 5; ypln++) {
-		if (ydie[ypln] == (sconum - 1)) {
-			crs += sconum;
-		}
-	}
-}
-
-void scorefh() {
-	int fhs;
-	fhs= 0;
-	for (ypln = 0; ypln < 6; ypln++) {
-		if ((dtsc[ypln] == 2) || (dtsc[ypln] == 3)) {
-			fhs++;
-		} else if (dtsc[ypln] == 1) {
-			fhs--;
-		}
-	}
-	if (fhs == 2) {
-		crs= 25;
-	}
-}
-
-void scoress() {
-	int snd;
-	snd= 0;
-	for (ypln = 0; ypln < 6; ypln++) {
-		if (dtsc[ypln] == 0) {
-			if (snd < 4) {
-				snd= 0;
-			}
-		} else {
-			snd++;
-		}
-	}
-	if (snd > 3) {
-		crs = 30;
-	}
-}
-
-void scorels() {
-	if ((dtsc[1] == 1) && (dtsc[2] == 1) && (dtsc[3] == 1) && (dtsc[4] == 1)) {
-		crs = 40;
-	}
-}
-
-void score3k() {
-	for (ypln = 0; ypln < 6; ypln++) {
-		if (dtsc[ypln] > 2) {
-			for (yplnh = 0; yplnh < 5; yplnh++) {
-				crs += (ydie[yplnh] + 1);
-			}
-		}
-	}
-}
-
-void score4k() {
-	for (ypln = 0; ypln < 6; ypln++) {
-		if (dtsc[ypln] > 3) {
-			for (yplnh = 0; yplnh < 5; yplnh++) {
-				crs += (ydie[yplnh] + 1);
-			}
-		}
-	}
-}
-
-void scorec() {
-	for (ypln = 0; ypln < 5; ypln++) {
-		crs += (ydie[ypln] + 1);
-	}
-}
-
-void scorey() {
-	if ( (ydie[0] == ydie[1]) && (ydie[0] == ydie[2]) && (ydie[0] == ydie[3]) && (ydie[0] == ydie[4])) {
-		crs += 50;
-	}
+	free(buf);
+	return;
 }

@@ -1,6 +1,5 @@
 /* YahtzeeServ - Yahtzee Game Service - NeoStats Addon Module
-** Copyright (c) 2003-2005 DeadNotBuried
-** Portions Copyright (c) 1999-2005, NeoStats
+** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, DeadNotBuried
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -26,7 +25,11 @@ Bot *ys_bot;
 /*
  * YahtzeeServ Module Help
 */
+extern const char *ys_help_set_verbose[];
+extern const char *ys_help_set_exclusions[];
 extern const char *ys_help_set_chan[];
+extern const char *ys_help_set_multichan[];
+extern const char *ys_help_set_chanoponly[];
 extern const char ys_help_start_oneline[];
 extern const char ys_help_stop_oneline[];
 extern const char ys_help_join_oneline[];
@@ -57,6 +60,11 @@ extern const char *ys_help_sheet[];
 extern const char *ys_help_top10[];
 extern const char *ys_help_high[];
 extern const char *ys_help_rules[];
+extern const char *ys_help_rules_page_0[];
+extern const char *ys_help_rules_page_1[];
+extern const char *ys_help_rules_page_2[];
+extern const char *ys_help_rules_page_3[];
+extern const char *ys_help_rules_page_4[];
 
 /*
  * Defines
@@ -64,85 +72,103 @@ extern const char *ys_help_rules[];
 #define YS_GAME_STOPPED		0x00000001	/* Game Not Running */
 #define YS_GAME_STARTING	0x00000002	/* Game Starting */
 #define YS_GAME_PLAYING		0x00000003	/* Game Running */
-#define YS_GAME_STOPPING	0x00000004	/* Game Running */
+#define YS_GAME_STOPPING	0x00000004	/* Game stopping */
+#define YS_MAX_PLAYERS		0x0000000A	/* Max Players Per Game */
+#define YS_HIGH_OVERALL		0x00000001	/* Overall High Score Type */
+#define YS_HIGH_DAILY		0x00000002	/* Daily High Score Type */
+#define YS_HIGH_WEEKLY		0x00000003	/* Weekly High Score Type */
+#define YS_HIGH_MONTHLY		0x00000004	/* Monthly High Score Type */
+#define YS_SCORE_DELETE		0x00000001	/* Delete Score From DB */
+#define YS_SCORE_ADD		0x00000002	/* Add Score To DB */
+#define YS_SCORE_NEW		0x00000003	/* New High Score Entry */
 
 /*
  * Variables
 */
-extern char yahtzeeroom[MAXCHANLEN];
-extern char ysplayernick[10][MAXNICK];
-extern int ysplayerscore[10];
+struct YahtzeeServ {
+	char yahtzeeroom[MAXCHANLEN];
+	int verbose;
+	int exclusions;
+	int multichan;
+	int chanoponly;
+} YahtzeeServ;
+
+typedef struct Players {
+	Client *u;
+	int score;
+	int hand[15];
+} Players;
+
+typedef struct GameData {
+	int playercount;
+	int gamestatus;
+	int timer;
+	int currentplayer;
+	int currentroll;
+	int currenthand;
+	int dice[5];
+	Players *pd[YS_MAX_PLAYERS];
+} GameData;
+
+typedef struct HighScoreData {
+	char typepos[6];
+	int type;
+	int position;
+	char name[MAXNICK];
+	int score;
+	int changed;
+} HighScoreData;
+
+extern list_t *gamelist;
+extern list_t *highscores;
+
 extern char *ysscoretype[15];
-extern int ysplayerhand[10][15];
-extern char *ysplayerhandused[10][15];
-extern int ypln;
-extern int yplnh;
-extern int currentyahtzeeplayercount;
-extern int currentyahtzeegamestatus;
-extern int currentplayer;
-extern int currentroll;
-extern int currenthand;
-extern int ydie[5];
-extern char *scoretext[100];
-extern int scoretextargs;
-extern char *tmpstr;
 extern int crs;
-extern int htsslrn;
-extern int htsslrold;
-extern char htsslrnickold[MAXNICK];
-extern int htsslr[100];
-extern char htsslrnick[100][MAXNICK];
-extern int dhtsslr[10];
-extern char dhtsslrnick[10][MAXNICK];
-extern int whtsslr[10];
-extern char whtsslrnick[10][MAXNICK];
-extern int mhtsslr[10];
-extern char mhtsslrnick[10][MAXNICK];
 extern int dtsc[6];
+extern char dicetext[5][15];
 
 /*
  * Procedures
 */
-int PlayerNickChange (CmdParams* cmdparams);
-int StartYahtzeeGame (CmdParams* cmdparams);
-int StopYahtzeeGame (CmdParams* cmdparams);
-int JoinYahtzeeGame (CmdParams* cmdparams);
-int RemoveYahtzeeGame (CmdParams* cmdparams);
-int ShowPlayersYahtzeeGame (CmdParams* cmdparams);
-int ShowTurnYahtzeeGame (CmdParams* cmdparams);
-int PassYahtzeeGame (CmdParams* cmdparams);
-int ShowYahtzeeDice (CmdParams* cmdparams);
-int ShowYahtzeeSheet (CmdParams* cmdparams);
-int RollYahtzeeDice (CmdParams* cmdparams);
-int KeepYahtzeeDice (CmdParams* cmdparams);
-int ScoreYahtzeeDice (CmdParams* cmdparams);
-int ShowTop10Lists (CmdParams* cmdparams);
+
+/* channel.c */
+int ys_cmd_set_chan (CmdParams *cmdparams, SET_REASON reason);
+void CreateChannelGameData(Channel *c);
+void RemoveChannelGameData(Channel *c, int fdc);
+
+/* highscores.c */
 int ShowHighList (CmdParams* cmdparams);
-int ShowRulePages (CmdParams* cmdparams);
-static int ys_cmd_set_chan (CmdParams *cmdparams, SET_REASON reason);
-void stopyahtzee(void);
-void yrolldie(void);
-void getdieroll(void);
-void yscore(char **argvy, int argcy);
-void reroll(char **argvy, int argcy, char *rolltype);
-void startcountdowntimer(char *nic);
-int startyahtzee(void);
-void scoredie(int sconum);
-void scorefh(void);
-void scoress(void);
-void scorels(void);
-void score3k(void);
-void score4k(void);
-void scorec(void);
-void scorey(void);
+int ShowTop10Lists (CmdParams* cmdparams);
 void loadyahtzeescores(void);
+int loadhighscores(void *data, int size);
+int sortlistbytypepos( const void *key1, const void *key2 );
 int yahtzeeday(void);
 int yahtzeeweek(void);
 int yahtzeemonth(void);
-void clearyahtzeedaily(void);
-void clearyahtzeeweekly(void);
-void clearyahtzeemonthly(void);
-void saveyahtzeedaily(void);
-void saveyahtzeeweekly(void);
-void saveyahtzeemonthly(void);
-void saveyahtzeeoverall(void);
+void clearyahtzeescores(int stc);
+void checkhighscorelists(Channel*c);
+
+/* misc.c */
+int ShowRulePages (CmdParams* cmdparams);
+int PassYahtzeeGame (CmdParams* cmdparams);
+int ShowPlayersYahtzeeGame (CmdParams* cmdparams);
+int ShowTurnYahtzeeGame (CmdParams* cmdparams);
+int ShowYahtzeeSheet (CmdParams* cmdparams);
+int ShowYahtzeeDice (CmdParams* cmdparams);
+int CheckPlayerPart (CmdParams *cmdparams);
+int CheckPlayerKick (CmdParams *cmdparams);
+int CheckPlayerQuit (CmdParams *cmdparams);
+int CheckPlayerKill (CmdParams *cmdparams);
+
+/* play.c */
+int StartYahtzeeGame (CmdParams* cmdparams);
+int yahtzeetimer(void);
+int JoinYahtzeeGame (CmdParams* cmdparams);
+int RemoveYahtzeeGame (CmdParams* cmdparams);
+void removenickfromgame(Channel *c, Client *u);
+int StopYahtzeeGame (CmdParams* cmdparams);
+int ScoreYahtzeeDice (CmdParams* cmdparams);
+void RollDice(Channel *c);
+int RollYahtzeeDice (CmdParams* cmdparams);
+int KeepYahtzeeDice (CmdParams* cmdparams);
+void reroll (CmdParams* cmdparams, int rolltype);

@@ -1,5 +1,18 @@
-YahtzeeServ ChangeLog
-=============================================================================
-
-3.0 - DeadNotBuried
-- Initial Release.
+SeenServ Module for NeoStats Changelog.
+Fish (F), Mark (M), DeadNotBuried (D)
+==============================================================================
+3.0.a3-dev
+ - ensure set chan target not currently hosting a game, and other checks
+   to ensure it is safe to change channels (D)
+ - fix bug not adding to high score lists when lists not full (D)
+ - add global and local exclusions for starting games in Channels and passing
+   games to other users (D)
+ - add verbose option to send to services channel when games start/stop etc (D)
+ - add setting to enable games starting in multi channels to chanops only (D)
+ - add setting to enable/disable games in multiple channels (D)
+ - allow IRCops and ChanOps to use "!stop" and "!remove Nick" at anytime (D)
+ - automatically remove players from games when they part/kicked from a channel,
+   or quit/killed from network (D)
+ - Complete rewrite to use ModData API, and allow Games to be played in
+   multiple channels at the same time (D)
+ - Convert from 2.5.x API to 3.0 API, and upload to SVN (D)

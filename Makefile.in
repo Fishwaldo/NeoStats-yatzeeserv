@@ -8,7 +8,7 @@ INSTALL_DATA = @INSTALL_DATA@
 DIRECTORY = @DIRINST@/modules/
 INCLUDES = -I@DIRINST@/include/ -I.
 
-SRCS= yahtzeeserv.c yahtzeeserv_help.c play.c events.c
+SRCS= yahtzeeserv.c yahtzeeserv_help.c play.c misc.c highscores.c channel.c
 OBJS= ${SRCS:.c=.o}
 TARGET= yahtzeeserv.so
 DOCS=README.YahtzeeServ

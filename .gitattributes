@@ -7,10 +7,12 @@
 /NEWS -text
 /README.YahtzeeServ -text
 /RELNOTES -text
+/channel.c -text
 /configure -text
 /configure.in -text
-/events.c -text
+/highscores.c -text
 /install-sh -text
+/misc.c -text
 /modconfig.h.in -text
 /modconfigwin32.h -text
 /play.c -text
