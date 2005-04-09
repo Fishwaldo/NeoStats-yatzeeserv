@@ -27,8 +27,8 @@
  * Set Main Yahtzee Game Channel
 */
 int ys_cmd_set_chan(CmdParams* cmdparams, SET_REASON reason) {
-	Channel *c, c2;
-	GameData *gd, gd2;
+	Channel *c, *c2;
+	GameData *gd, *gd2;
 
 	if (reason == SET_VALIDATE) {
 		c = FindChannel(YahtzeeServ.yahtzeeroom);
@@ -44,7 +44,7 @@ int ys_cmd_set_chan(CmdParams* cmdparams, SET_REASON reason) {
 			}
 		}
 		c2 = FindChannel(cmdparams->av[1]);
-		if (!c2)
+		if (!c2) {
 			irc_prefmsg (ys_bot, cmdparams->source, "Target Channel MUST be online.");
 			return NS_FAILURE;
 		}
