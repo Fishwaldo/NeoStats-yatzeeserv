@@ -221,7 +221,7 @@ void removenickfromgame(Channel *c, Client *u) {
 					gd->pd[i2]->u = gd->pd[(i2 + 1)]->u;
 					gd->pd[i2]->score = gd->pd[(i2 + 1)]->score;
 					for (i3 = 0 ; i3 < 15 ; i3++) {
-						gd->pd[i2]->hand[13] = gd->pd[(i2 + 1)]->hand[i3];
+						gd->pd[i2]->hand[i3] = gd->pd[(i2 + 1)]->hand[i3];
 					}
 				} else {
 					gd->pd[i2]->u = NULL;
