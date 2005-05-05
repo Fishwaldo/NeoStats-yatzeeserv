@@ -589,14 +589,7 @@ int KeepYahtzeeDice (CmdParams* cmdparams)
 */
 void reroll(CmdParams* cmdparams, int rolltype) {
 	GameData *gd;
-	char *ydiec[5];
-	char *dienums;
-	int keepdie[5];
-	char *tstdni;
 	char *buf;
-	int kdt1;
-	int kdt2;
-
 	int i, dc;
 	
 	if (!GetUserModValue(cmdparams->source)) {
