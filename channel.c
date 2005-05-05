@@ -85,22 +85,10 @@ void CreateChannelGameData(Channel *c) {
 	int i2;
 	
 	gd = ns_calloc(sizeof(GameData));
-	gd->playercount = 0;
 	gd->gamestatus = YS_GAME_STOPPED;
 	gd->timer = me.now;
-	gd->currentplayer = 0;
-	gd->currentroll = 0;
-	gd->currenthand = 0;
-	for (i = 0 ; i < 5 ; i++) {
-		gd->dice[i] = 0;
-	}
 	for (i = 0 ; i < YS_MAX_PLAYERS ; i++) {
 		gd->pd[i] = ns_calloc(sizeof(Players));
-		gd->pd[i]->u = NULL;
-		gd->pd[i]->score = 0;
-		for (i2 = 0 ; i2 < 15 ; i2++) {
-			gd->pd[i]->hand[i2] = 0;
-		}
 	}
 	SetChannelModValue(c, gd);
 	lnode_create_append(gamelist, c);
