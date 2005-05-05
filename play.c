@@ -643,6 +643,6 @@ void reroll(CmdParams* cmdparams, int rolltype) {
 	if (gd->currentroll == 3) {
 		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039That was your last roll this turn\0037 %s\0039, select which score to take", cmdparams->source->name);
 	}
-	free(buf);
+	ns_free(buf);
 	return;
 }
