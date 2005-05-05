@@ -210,12 +210,14 @@ int CheckPlayerPart (CmdParams *cmdparams) {
 	if (GetUserModValue(cmdparams->source) > 0) {
 		removenickfromgame(cmdparams->channel, cmdparams->source);
 	}
+	return NS_SUCCESS;
 }
 
 int CheckPlayerKick (CmdParams *cmdparams) {
 	if (GetUserModValue(cmdparams->target) > 0) {
 		removenickfromgame(cmdparams->channel, cmdparams->target);
 	}
+	return NS_SUCCESS;
 }
 
 int CheckPlayerQuit (CmdParams *cmdparams) {
@@ -234,6 +236,7 @@ int CheckPlayerQuit (CmdParams *cmdparams) {
 			ln = list_next(gamelist, ln);
 		}
 	}
+	return NS_SUCCESS;
 }
 
 int CheckPlayerKill (CmdParams *cmdparams) {
@@ -252,4 +255,5 @@ int CheckPlayerKill (CmdParams *cmdparams) {
 			ln = list_next(gamelist, ln);
 		}
 	}
+	return NS_SUCCESS;
 }

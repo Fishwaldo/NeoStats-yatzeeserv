@@ -618,7 +618,7 @@ void reroll(CmdParams* cmdparams, int rolltype) {
 	buf= joinbuf(cmdparams->av, cmdparams->ac, 0);
 	strip_mirc_codes(buf);
 	for (i = 0; i < 5; i++) {
-		if ((!strchr(buf, (i + 49)) == NULL && rolltype) || (strchr(buf, (i + 49)) == NULL && !rolltype)) {
+		if ((strchr(buf, (i + 49)) != NULL && rolltype) || (strchr(buf, (i + 49)) == NULL && !rolltype)) {
 			gd->dice[i]= rand() % 6;
 			dc = 4;
 		} else {
