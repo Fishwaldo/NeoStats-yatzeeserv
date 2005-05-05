@@ -122,7 +122,7 @@ void RemoveChannelGameData(Channel *c, int fdc) {
 	for ( i = 0 ; i < YS_MAX_PLAYERS ; i++) {
 		if (gd->pd[i]->u) {
 			if (GetUserModValue(gd->pd[i]->u) > 0) {
-				SetUserModValue(gd->pd[i]->u,(GetUserModValue(gd->pd[i]->u) - 1));
+				SetUserModValue(gd->pd[i]->u,(void *)((int)GetUserModValue(gd->pd[i]->u) - 1));
 			}
 		}
 		gd->pd[i]->u = NULL;

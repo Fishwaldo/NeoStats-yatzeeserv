@@ -159,9 +159,9 @@ int JoinYahtzeeGame (CmdParams* cmdparams) {
 			}
 			gd->playercount++;
 			if (!GetUserModValue(cmdparams->source)) {
-				SetUserModValue(cmdparams->source,1);
+				SetUserModValue(cmdparams->source,(void *)1);
 			} else {
-				SetUserModValue(cmdparams->source,(GetUserModValue(cmdparams->source) + 1));
+				SetUserModValue(cmdparams->source,(void *)((int)GetUserModValue(cmdparams->source) + 1));
 			}
 			irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0038Welcome to Yahtzee \0037%s", cmdparams->source->name);
 		} else {
@@ -214,7 +214,7 @@ void removenickfromgame(Channel *c, Client *u) {
 	for (i = 0 ; i < gd->playercount ; i++) {
 		if (gd->pd[i]->u == u) {
 			if (GetUserModValue(u) > 0) {
-				SetUserModValue(u,(GetUserModValue(u) - 1));
+				SetUserModValue(u,(void *)((int)GetUserModValue(u) - 1));
 			}
 			for (i2 = i ; i2 < gd->playercount ; i2++) {
 				if (i2 < (gd->playercount - 1)) {

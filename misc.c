@@ -83,13 +83,13 @@ int PassYahtzeeGame (CmdParams* cmdparams)
 				return NS_SUCCESS;
 			}
 			if (GetUserModValue(cmdparams->source) > 0) {
-				SetUserModValue(cmdparams->source,(GetUserModValue(cmdparams->source) - 1));
+				SetUserModValue(cmdparams->source,(void *)((int)GetUserModValue(cmdparams->source) - 1));
 			}
 			gd->pd[i]->u = u;
 			if (!GetUserModValue(u)) {
-				SetUserModValue(u,1);
+				SetUserModValue(u,(void *)1);
 			} else {
-				SetUserModValue(u,(GetUserModValue(u) + 1));
+				SetUserModValue(u,(void *)((int)GetUserModValue(u) + 1));
 			}
 			if (!gp) {
 				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0037%s\0039 has passed their game to\0037 %s", cmdparams->source->name, u->name);
