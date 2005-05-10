@@ -25,7 +25,6 @@ Bot *ys_bot;
 /*
  * YahtzeeServ Module Help
 */
-extern const char *ys_help_set_verbose[];
 extern const char *ys_help_set_exclusions[];
 extern const char *ys_help_set_chan[];
 extern const char *ys_help_set_multichan[];
@@ -87,7 +86,6 @@ extern const char *ys_help_rules_page_4[];
 */
 struct YahtzeeServ {
 	char yahtzeeroom[MAXCHANLEN];
-	int verbose;
 	int exclusions;
 	int multichan;
 	int chanoponly;

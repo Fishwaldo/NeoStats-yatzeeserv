@@ -23,11 +23,6 @@
 #include "neostats.h"    /* Required for bot support */
 #include "yahtzeeserv.h"
 
-const char *ys_help_set_verbose[] = {
-	"\2VERBOSE <ON|OFF>\2 - Sets reporting to Services Channel on or off",
-	NULL
-};
-
 const char *ys_help_set_exclusions[] = {
 	"\2EXCLUSIONS <ON|OFF>\2 - Use Global Exclusion Lists",
 	NULL

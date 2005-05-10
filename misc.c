@@ -28,12 +28,15 @@
 */
 int ShowRulePages (CmdParams* cmdparams)
 {
-	if (cmdparams->ac < 1) {
+	SET_SEGV_LOCATION();
+	if (cmdparams->ac < 1) 
+	{
 		irc_prefmsg (ys_bot, cmdparams->source, "Welcome To Yahtzee %s", cmdparams->source->name);
 		irc_prefmsg (ys_bot, cmdparams->source, " ");
 		irc_prefmsg_list (ys_bot, cmdparams->source, ys_help_rules_page_0);
 	} else {
-		if (!ircstrcasecmp (cmdparams->av[0], "1")) {
+		if (!ircstrcasecmp (cmdparams->av[0], "1")) 
+		{
 			irc_prefmsg_list (ys_bot, cmdparams->source, ys_help_rules_page_1);
 		} else if (!ircstrcasecmp (cmdparams->av[0], "2")) {
 			irc_prefmsg_list (ys_bot, cmdparams->source, ys_help_rules_page_2);
@@ -55,24 +58,22 @@ int PassYahtzeeGame (CmdParams* cmdparams)
 	Client *u;
 	int i, gp;
 
-	if (!GetUserModValue(cmdparams->source)) {
+	SET_SEGV_LOCATION();
+	if (!GetUserModValue(cmdparams->source))
 		return NS_SUCCESS;
-	}
 	gd = (GameData *)GetChannelModValue(cmdparams->channel);
-	if (!gd) {
+	if (!gd)
 		return NS_SUCCESS;
-	}
-	if (!gd->playercount) {
+	if (!gd->playercount || cmdparams->ac < 1)
 		return NS_SUCCESS;
-	}
-	if (cmdparams->ac < 1) {
-		return NS_SUCCESS;
-	}
 	gp = 0;
-	for (i = 0 ; i < gd->playercount ; i++) {
-		if (gd->pd[i]->u == cmdparams->source) {
+	for (i = 0 ; i < gd->playercount ; i++) 
+	{
+		if (gd->pd[i]->u == cmdparams->source) 
+		{
 			u = FindUser(cmdparams->av[0]);
-			if (!u) {
+			if (!u) 
+			{
 				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "Sorry %s , There is no %s currently Online", cmdparams->source->name, cmdparams->av[0]);
 				return NS_SUCCESS;
 			} else if ((YahtzeeServ.exclusions && IsExcluded(u)) || ModIsUserExcluded(u) || IsMe(u) || IsBot(u)) {
@@ -82,18 +83,15 @@ int PassYahtzeeGame (CmdParams* cmdparams)
 				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "Just play the game %s and stop trying to be smart", cmdparams->source->name);
 				return NS_SUCCESS;
 			}
-			if (GetUserModValue(cmdparams->source) > 0) {
+			if (GetUserModValue(cmdparams->source) > 0)
 				SetUserModValue(cmdparams->source,(void *)((int)GetUserModValue(cmdparams->source) - 1));
-			}
 			gd->pd[i]->u = u;
-			if (!GetUserModValue(u)) {
+			if (!GetUserModValue(u))
 				SetUserModValue(u,(void *)1);
-			} else {
+			else
 				SetUserModValue(u,(void *)((int)GetUserModValue(u) + 1));
-			}
-			if (!gp) {
+			if (!gp)
 				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0037%s\0039 has passed their game to\0037 %s", cmdparams->source->name, u->name);
-			}
 			gp++;
 		}
 	}
@@ -107,13 +105,12 @@ int ShowPlayersYahtzeeGame (CmdParams* cmdparams)
 {
 	GameData *gd;
 
+	SET_SEGV_LOCATION();
 	gd = (GameData *)GetChannelModValue(cmdparams->channel);
-	if (!gd) {
+	if (!gd)
 		return NS_SUCCESS;
-	}
-	if (gd->gamestatus == YS_GAME_PLAYING) {
+	if (gd->gamestatus == YS_GAME_PLAYING)
 		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\00310The Current Yahtzee Players in\0037 %s \00310are\0038 :\0037 %s %s %s %s %s %s %s %s %s %s", cmdparams->channel->name, gd->pd[0]->u ? gd->pd[0]->u->name : "", gd->pd[1]->u ? gd->pd[1]->u->name : "", gd->pd[2]->u ? gd->pd[2]->u->name : "", gd->pd[3]->u ? gd->pd[3]->u->name : "", gd->pd[4]->u ? gd->pd[4]->u->name : "", gd->pd[5]->u ? gd->pd[5]->u->name : "", gd->pd[6]->u ? gd->pd[6]->u->name : "", gd->pd[7]->u ? gd->pd[7]->u->name : "", gd->pd[8]->u ? gd->pd[8]->u->name : "", gd->pd[9]->u ? gd->pd[9]->u->name : "");
-	}
 	return NS_SUCCESS;
 }
 
@@ -124,13 +121,12 @@ int ShowTurnYahtzeeGame (CmdParams* cmdparams)
 {
 	GameData *gd;
 
+	SET_SEGV_LOCATION();
 	gd = (GameData *)GetChannelModValue(cmdparams->channel);
-	if (!gd) {
+	if (!gd)
 		return NS_SUCCESS;
-	}
-	if (gd->gamestatus == YS_GAME_PLAYING) {
+	if (gd->gamestatus == YS_GAME_PLAYING)
 		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039The current Player is \0038 :\0037 %s", gd->pd[gd->currentplayer]->u->name);
-	}
 	return NS_SUCCESS;
 }
 
@@ -142,16 +138,18 @@ int ShowYahtzeeSheet (CmdParams* cmdparams)
 	GameData *gd;
 	int i;
 
+	SET_SEGV_LOCATION();
 	gd = (GameData *)GetChannelModValue(cmdparams->channel);
-	if (!gd) {
+	if (!gd)
 		return NS_SUCCESS;
-	}
-	if (!GetUserModValue(cmdparams->source)) {
+	if (!GetUserModValue(cmdparams->source))
 		return NS_SUCCESS;
-	}
-	if (gd->gamestatus == YS_GAME_PLAYING) {
-		for (i = 0; i < gd->playercount; i++) {
-			if (gd->pd[i]->u == cmdparams->source) {
+	if (gd->gamestatus == YS_GAME_PLAYING) 
+	{
+		for (i = 0; i < gd->playercount; i++) 
+		{
+			if (gd->pd[i]->u == cmdparams->source) 
+			{
 				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0037%s\0038 your current scores are :\0039 %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d%s\0039 , %s\00311 %d\0039 , %s\00311 %d\0039 , Total\00311 %d",
 					cmdparams->source->name, ysscoretype[0], gd->pd[i]->hand[0] < 0 ? 0 : gd->pd[i]->hand[0], gd->pd[i]->hand[0] < 0 ? "\0034\2x\2" : "", ysscoretype[1], gd->pd[i]->hand[1] < 0 ? 0 : gd->pd[i]->hand[1], gd->pd[i]->hand[1] < 0 ? "\0034\2x\2" : "", ysscoretype[2], gd->pd[i]->hand[2] < 0 ? 0 : gd->pd[i]->hand[2], gd->pd[i]->hand[2] < 0 ? "\0034\2x\2" : "", 
 					ysscoretype[3], gd->pd[i]->hand[3] < 0 ? 0 : gd->pd[i]->hand[3], gd->pd[i]->hand[3] < 0 ? "\0034\2x\2" : "", ysscoretype[4], gd->pd[i]->hand[4] < 0 ? 0 : gd->pd[i]->hand[4], gd->pd[i]->hand[4] < 0 ? "\0034\2x\2" : "", ysscoretype[5], gd->pd[i]->hand[5] < 0 ? 0 : gd->pd[i]->hand[5], gd->pd[i]->hand[5] < 0 ? "\0034\2x\2" : "", 
@@ -172,16 +170,18 @@ int ShowYahtzeeDice (CmdParams* cmdparams)
 	GameData *gd;
 	int i;
 
+	SET_SEGV_LOCATION();
 	gd = (GameData *)GetChannelModValue(cmdparams->channel);
-	if (!gd) {
+	if (!gd)
 		return NS_SUCCESS;
-	}
-	if (!GetUserModValue(cmdparams->source)) {
+	if (!GetUserModValue(cmdparams->source))
 		return NS_SUCCESS;
-	}
-	if (gd->gamestatus == YS_GAME_PLAYING && gd->pd[gd->currentplayer]->u == cmdparams->source) {
-		for (i = 0; i < 5; i++) {
-			if (gd->dice[i] == 0) {
+	if (gd->gamestatus == YS_GAME_PLAYING && gd->pd[gd->currentplayer]->u == cmdparams->source) 
+	{
+		for (i = 0; i < 5; i++) 
+		{
+			if (gd->dice[i] == 0) 
+			{
 				strlcpy(dicetext[i], "One", 15);
 			} else if (gd->dice[i] == 1) {
 				strlcpy(dicetext[i], "Two", 15);
@@ -207,16 +207,16 @@ int ShowYahtzeeDice (CmdParams* cmdparams)
  * and if so, remove from games as appropriate
 */
 int CheckPlayerPart (CmdParams *cmdparams) {
-	if (GetUserModValue(cmdparams->source) > 0) {
+	SET_SEGV_LOCATION();
+	if (GetUserModValue(cmdparams->source) > 0)
 		removenickfromgame(cmdparams->channel, cmdparams->source);
-	}
 	return NS_SUCCESS;
 }
 
 int CheckPlayerKick (CmdParams *cmdparams) {
-	if (GetUserModValue(cmdparams->target) > 0) {
+	SET_SEGV_LOCATION();
+	if (GetUserModValue(cmdparams->target) > 0)
 		removenickfromgame(cmdparams->channel, cmdparams->target);
-	}
 	return NS_SUCCESS;
 }
 
@@ -225,33 +225,38 @@ int CheckPlayerQuit (CmdParams *cmdparams) {
 	Channel *c;
 	lnode_t	*ln;
 
-	if (GetUserModValue(cmdparams->source) > 0) {
+	SET_SEGV_LOCATION();
+	if (GetUserModValue(cmdparams->source) > 0) 
+	{
 		ln = list_first(gamelist);
-		while (ln != NULL && GetUserModValue(cmdparams->source) > 0) {
+		while (ln && GetUserModValue(cmdparams->source) > 0) 
+		{
 			c = lnode_get(ln);
 			gd = (GameData *)GetChannelModValue(c);
-			if (gd) {
+			if (gd)
 				removenickfromgame(c, cmdparams->source);
-			}
 			ln = list_next(gamelist, ln);
 		}
 	}
 	return NS_SUCCESS;
 }
 
-int CheckPlayerKill (CmdParams *cmdparams) {
+int CheckPlayerKill (CmdParams *cmdparams) 
+{
 	GameData *gd;
 	Channel *c;
 	lnode_t	*ln;
 
-	if (GetUserModValue(cmdparams->target) > 0) {
+	SET_SEGV_LOCATION();
+	if (GetUserModValue(cmdparams->target) > 0) 
+	{
 		ln = list_first(gamelist);
-		while (ln != NULL && GetUserModValue(cmdparams->target) > 0) {
+		while (ln != NULL && GetUserModValue(cmdparams->target) > 0) 
+		{
 			c = lnode_get(ln);
 			gd = (GameData *)GetChannelModValue(c);
-			if (gd) {
+			if (gd)
 				removenickfromgame(c, cmdparams->target);
-			}
 			ln = list_next(gamelist, ln);
 		}
 	}

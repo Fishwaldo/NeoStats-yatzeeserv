@@ -63,7 +63,6 @@ static bot_cmd ys_commands[]=
 
 static bot_setting ys_settings[]=
 {
-	{"VERBOSE",	&YahtzeeServ.verbose,		SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_verbose,	NULL,			(void *)0 },
 	{"EXCLUSIONS",	&YahtzeeServ.exclusions,	SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_exclusions,	NULL,			(void *)0 },
 	{"CHAN",	&YahtzeeServ.yahtzeeroom,	SET_TYPE_CHANNEL,	0,	MAXCHANLEN,	NS_ULEVEL_ADMIN,	NULL,	ys_help_set_chan,	ys_cmd_set_chan,	(void *)"#Games_Yahtzee" },
 	{"MULTICHAN",	&YahtzeeServ.multichan,		SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_multichan,	NULL,			(void *)0 },
@@ -94,8 +93,6 @@ ModuleEvent module_events[] = {
 	{EVENT_QUIT,		CheckPlayerQuit},
 	{EVENT_KILL,		CheckPlayerKill},
 	{EVENT_LOCALKILL,	CheckPlayerKill},
-	{EVENT_GLOBALKILL,	CheckPlayerKill},
-	{EVENT_SERVERKILL,	CheckPlayerKill},
 	{EVENT_PART,		CheckPlayerPart},
 	{EVENT_KICK,		CheckPlayerKick},
 	{EVENT_NULL, NULL}
@@ -130,9 +127,8 @@ int ModSynch (void)
 	Channel *c;
 	
 	ys_bot = AddBot (&ys_botinfo);	
-	if (!ys_bot) {
+	if (!ys_bot)
 		return NS_FAILURE;
-	}
 	srand((unsigned int)me.now);
 	irc_chanalert (ys_bot, "Game will start in %s", YahtzeeServ.yahtzeeroom);
 	irc_join (ys_bot, YahtzeeServ.yahtzeeroom, "+o");

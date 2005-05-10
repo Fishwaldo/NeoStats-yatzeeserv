@@ -23,6 +23,25 @@
 #include "neostats.h"    /* Required for bot support */
 #include "yahtzeeserv.h"
 
+/** highscore_report
+ *
+ *  handles channel/user message selection
+ */
+static char highscore_report_buf[BUFSIZE];
+
+void highscore_report( CmdParams *cmdparams, const char *fmt, ... )
+{
+	va_list ap;
+
+	va_start( ap, fmt );
+	ircvsnprintf( highscore_report_buf, BUFSIZE, fmt, ap );
+	va_end( ap );
+	if( cmdparams->channel == NULL )
+		irc_prefmsg (ys_bot, cmdparams->source, highscore_report_buf );
+	else
+		irc_chanprivmsg (ys_bot, cmdparams->channel->name, highscore_report_buf );
+}
+
 /*
  * Display High Score Pages
 */
@@ -32,26 +51,21 @@ int ShowHighList (CmdParams* cmdparams)
 	HighScoreData *hs;
 	int i;
 
-	i = 1;
-	if (cmdparams->ac) {
-		if (atoi(cmdparams->av[0]) && atoi(cmdparams->av[0]) < 6) {
+	SET_SEGV_LOCATION();
+	i = 1;		/* default to displaying from first record */
+	if (cmdparams->ac) 
+	{
+		if (atoi(cmdparams->av[0]) && atoi(cmdparams->av[0]) < 6)
 			i = ( ( atoi(cmdparams->av[0]) * 20 ) - 19 );
-		}
 	}
-	if (cmdparams->channel) {
-		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039Top Scores so far %d-%d\0038 :", i, (i +19));
-	} else {
-		irc_prefmsg (ys_bot, cmdparams->source, "\0039Top Scores so far %d-%d\0038 :", i, (i +19));
-	}
+	highscore_report( cmdparams, "\0039Top Scores so far %d-%d\0038 :", i, (i +19));
 	ln = list_first(highscores);
-	while (ln != NULL) {
+	while (ln) 
+	{
 		hs = lnode_get(ln);
-		if (hs->typepos[0] == 'O' && hs->position >= i && hs->position < (i + 20)) {
-			if (cmdparams->channel) {
-				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039 %d\0038  :\0037 %s \0039with\00311 %d\0039 points.", hs->position, hs->name, hs->score);
-			} else {
-				irc_prefmsg (ys_bot, cmdparams->source, "\0039 %d\0038  :\0037 %s \0039with\00311 %d\0039 points.", hs->position, hs->name, hs->score);
-			}
+		if (hs->typepos[0] == 'O' && hs->position >= i && hs->position < (i + 20)) 
+		{
+			highscore_report( cmdparams, "\0039 %d\0038  :\0037 %s \0039with\00311 %d\0039 points.", hs->position, hs->name, hs->score);
 		} else if (hs->typepos[0] == 'O' && hs->position == (i + 20)) {
 			ln = list_last(highscores);
 			continue;
@@ -67,50 +81,34 @@ int ShowHighList (CmdParams* cmdparams)
 int ShowTop10Lists (CmdParams* cmdparams) {
 	lnode_t *ln;
 	HighScoreData *hs;
-	int i, st;
+	int i, showtype;
 	
+	SET_SEGV_LOCATION();
 	i = 0;
-	st = 'O';
-	if (cmdparams->ac > 0) {
-		if (cmdparams->av[0][0] == 'D' || cmdparams->av[0][0] == 'd') {
-			if (cmdparams->channel) {
-				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039Top 10 Scores so far Today\0038 :");
-			} else {
-				irc_prefmsg (ys_bot, cmdparams->source, "\0039Top 10 Scores so far Today\0038 :");
-			}
-			st = 'D';
+	showtype = 'O';
+	if (cmdparams->ac > 0) 
+	{
+		if (cmdparams->av[0][0] == 'D' || cmdparams->av[0][0] == 'd') 
+		{
+			highscore_report( cmdparams, "\0039Top 10 Scores so far Today\0038 :");
+			showtype = 'D';
 		} else if (cmdparams->av[0][0] == 'W' || cmdparams->av[0][0] == 'w') {
-			if (cmdparams->channel) {
-				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039Top 10 Scores so far This Week\0038 :");
-			} else {
-				irc_prefmsg (ys_bot, cmdparams->source, "\0039Top 10 Scores so far This Week\0038 :");
-			}
-			st = 'W';
+			highscore_report( cmdparams, "\0039Top 10 Scores so far This Week\0038 :");
+			showtype = 'W';
 		} else if (cmdparams->av[0][0] == 'M' || cmdparams->av[0][0] == 'm') {
-			if (cmdparams->channel) {
-				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039Top 10 Scores so far This Month\0038 :");
-			} else {
-				irc_prefmsg (ys_bot, cmdparams->source, "\0039Top 10 Scores so far This Month\0038 :");
-			}
-			st = 'M';
+			highscore_report( cmdparams, "\0039Top 10 Scores so far This Month\0038 :");
+			showtype = 'M';
 		}
 	}
-	if (st == 'O') {
-		if (cmdparams->channel) {
-			irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039Top 10 Scores so far\0038 :");
-		} else {
-			irc_prefmsg (ys_bot, cmdparams->source, "\0039Top 10 Scores so far\0038 :");
-		}
-	}
+	if (showtype == 'O')
+		highscore_report( cmdparams, "\0039Top 10 Scores so far\0038 :");
 	ln = list_first(highscores);
-	while (ln != NULL && i < 10) {
+	while (ln && i < 10) 
+	{
 		hs = lnode_get(ln);
-		if (hs->type == st) {
-			if (cmdparams->channel) {
-				irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0039 %d\0038  :\0037 %s \0039with\00311 %d\0039 points.", hs->position, hs->name, hs->score);
-			} else {
-				irc_prefmsg (ys_bot, cmdparams->source, "\0039 %d\0038  :\0037 %s \0039with\00311 %d\0039 points.", hs->position, hs->name, hs->score);
-			}
+		if (hs->type == showtype) 
+		{
+			highscore_report( cmdparams, "\0039 %d\0038  :\0037 %s \0039with\00311 %d\0039 points.", hs->position, hs->name, hs->score);
 			i++;
 		}
 		ln = list_next(highscores, ln);
@@ -121,7 +119,8 @@ int ShowTop10Lists (CmdParams* cmdparams) {
 /*
  * Load High Scores
 */
-void loadyahtzeescores(void) {
+void loadyahtzeescores(void) 
+{
 	highscores = list_create( -1 );
 	DBAFetchRows("Scores", loadhighscores);
 	list_sort(highscores, sortlistbytypepos);
@@ -130,7 +129,8 @@ void loadyahtzeescores(void) {
 /*
  * Add High Scores to list
 */
-int loadhighscores(void *data, int size) {
+int loadhighscores(void *data, int size) 
+{
 	HighScoreData *hs;
 
 	hs = ns_calloc(sizeof(HighScoreData));
@@ -142,33 +142,39 @@ int loadhighscores(void *data, int size) {
 /*
  * Sort High Score List
 */
-int sortlistbytypepos( const void *key1, const void *key2 ) {
+int sortlistbytypepos( const void *key1, const void *key2 ) 
+{
 	const HighScoreData *hs1 = key1;
 	const HighScoreData *hs2 = key2;
-	if (hs1->type == hs2->type) {
+	if (hs1->type == hs2->type)
 		return (hs1->position - hs2->position);
-	}
 	return (hs1->type - hs2->type);
 }
 
 /*
  * Select High Scores to remove
 */
-int yahtzeeday(void) {
+int yahtzeeday(void) 
+{
+	SET_SEGV_LOCATION();
 	irc_chanalert (ys_bot, "\0038It's Midnight Here : \0037Clearing Daily Top 10 List");
 	irc_chanprivmsg (ys_bot, YahtzeeServ.yahtzeeroom, "\0038It's Midnight Here : \0037Clearing Daily Top 10 List");
 	clearyahtzeescores('D');
 	return NS_SUCCESS;
 }
 
-int yahtzeeweek(void) {
+int yahtzeeweek(void) 
+{
+	SET_SEGV_LOCATION();
 	irc_chanalert (ys_bot, "\0038It's Sunday Here : \0037Clearing Weekly Top 10 List");
 	irc_chanprivmsg (ys_bot, YahtzeeServ.yahtzeeroom, "\0038It's Sunday Here : \0037Clearing Weekly Top 10 List");
 	clearyahtzeescores('W');
 	return NS_SUCCESS;
 }
 
-int yahtzeemonth(void) {
+int yahtzeemonth(void) 
+{
+	SET_SEGV_LOCATION();
 	irc_chanalert (ys_bot, "\0038It's The First Here : \0037Clearing Monthly Top 10 List");
 	irc_chanprivmsg (ys_bot, YahtzeeServ.yahtzeeroom, "\0038It's The First Here : \0037Clearing Monthly Top 10 List");
 	clearyahtzeescores('M');
@@ -178,14 +184,17 @@ int yahtzeemonth(void) {
 /* 
  * Clear Selected High Scores
 */
-void clearyahtzeescores(int stc) {
+void clearyahtzeescores(int clearscore) 
+{
 	lnode_t *ln, *ln2;
 	HighScoreData *hs;
 
 	ln = list_first(highscores);
-	while (ln != NULL) {
+	while (ln) 
+	{
 		hs = lnode_get(ln);
-		if (hs->typepos[0] == stc) {
+		if (hs->typepos[0] == clearscore) 
+		{
 			DBADelete( "Scores", hs->typepos);
 			ln2 = list_next(highscores, ln);
 			ns_free(hs);
@@ -202,32 +211,36 @@ void clearyahtzeescores(int stc) {
 /*
  * Check for new High Scores
 */
-void checkhighscorelists(Channel *c) {
+void checkhighscorelists(Channel *c) 
+{
 	lnode_t *ln, *ln2;
 	HighScoreData *hs, *hs2;
 	GameData *gd;
-	int i, np, nhs;
+	int i, newposition, newhighscore;
 
 	gd = (GameData *)GetChannelModValue(c);
-	if (!gd) {
+	if (!gd)
 		return;
-	}
-	nhs = 0;
-	for (i = 0 ; i < gd->playercount ; i++) {
-		np = 1;
+	newhighscore = 0;
+	for (i = 0 ; i < gd->playercount ; i++) 
+	{
+		newposition = 1;
 		list_sort(highscores, sortlistbytypepos);
 		ln = list_last(highscores);
-		while (ln != NULL) {
+		while (ln) 
+		{
 			hs = lnode_get(ln);
-			if (hs->typepos[0] == 'D') {
-				if (np == 1) {
-					np = (hs->position + 1);
-				}
-				if (hs->score < gd->pd[i]->score) {
+			if (hs->typepos[0] == 'D') 
+			{
+				if (newposition == 1)
+					newposition = (hs->position + 1);
+				if (hs->score < gd->pd[i]->score) 
+				{
 					DBADelete( "Scores", hs->typepos);
-					np = hs->position;
+					newposition = hs->position;
 					hs->position++;
-					if (hs->position < 11) {
+					if (hs->position < 11) 
+					{
 						ircsnprintf(hs->typepos, 6, "%s%d", "D", hs->position);
 						DBAStore( "Scores", hs->typepos, (void*)hs, sizeof(HighScoreData));
 					} else {
@@ -242,11 +255,12 @@ void checkhighscorelists(Channel *c) {
 			}
 			ln = list_prev(highscores, ln);
 		}
-		if (np < 11) {
+		if (newposition < 11) 
+		{
 			hs = ns_calloc(sizeof(HighScoreData));
-			ircsnprintf(hs->typepos, 6, "%s%d", "D", np);
+			ircsnprintf(hs->typepos, 6, "%s%d", "D", newposition);
 			hs->type = 'D';
-			hs->position = np;
+			hs->position = newposition;
 			strlcpy(hs->name, gd->pd[i]->u->name, MAXNICK);
 			hs->score = gd->pd[i]->score;
 			hs->changed = 0;
@@ -254,20 +268,23 @@ void checkhighscorelists(Channel *c) {
 			hs->changed = YS_SCORE_NEW;
 			lnode_create_append( highscores, hs );
 		}
-		np = 1;
+		newposition = 1;
 		list_sort(highscores, sortlistbytypepos);
 		ln = list_last(highscores);
-		while (ln != NULL) {
+		while (ln) 
+		{
 			hs = lnode_get(ln);
-			if (hs->typepos[0] == 'W') {
-				if (np == 1) {
-					np = (hs->position + 1);
-				}
-				if (hs->score < gd->pd[i]->score) {
+			if (hs->typepos[0] == 'W') 
+			{
+				if (newposition == 1)
+					newposition = (hs->position + 1);
+				if (hs->score < gd->pd[i]->score) 
+				{
 					DBADelete( "Scores", hs->typepos);
-					np = hs->position;
+					newposition = hs->position;
 					hs->position++;
-					if (hs->position < 11) {
+					if (hs->position < 11) 
+					{
 						ircsnprintf(hs->typepos, 6, "%s%d", "W", hs->position);
 						DBAStore( "Scores", hs->typepos, (void*)hs, sizeof(HighScoreData));
 					} else {
@@ -282,11 +299,12 @@ void checkhighscorelists(Channel *c) {
 			}
 			ln = list_prev(highscores, ln);
 		}
-		if (np < 11) {
+		if (newposition < 11) 
+		{
 			hs = ns_calloc(sizeof(HighScoreData));
-			ircsnprintf(hs->typepos, 6, "%s%d", "W", np);
+			ircsnprintf(hs->typepos, 6, "%s%d", "W", newposition);
 			hs->type = 'W';
-			hs->position = np;
+			hs->position = newposition;
 			strlcpy(hs->name, gd->pd[i]->u->name, MAXNICK);
 			hs->score = gd->pd[i]->score;
 			hs->changed = 0;
@@ -294,20 +312,23 @@ void checkhighscorelists(Channel *c) {
 			hs->changed = YS_SCORE_NEW;
 			lnode_create_append( highscores, hs );
 		}
-		np = 1;
+		newposition = 1;
 		list_sort(highscores, sortlistbytypepos);
 		ln = list_last(highscores);
-		while (ln != NULL) {
+		while (ln) 
+		{
 			hs = lnode_get(ln);
-			if (hs->typepos[0] == 'M') {
-				if (np == 1) {
-					np = (hs->position + 1);
-				}
-				if (hs->score < gd->pd[i]->score) {
+			if (hs->typepos[0] == 'M') 
+			{
+				if (newposition == 1)
+					newposition = (hs->position + 1);
+				if (hs->score < gd->pd[i]->score) 
+				{
 					DBADelete( "Scores", hs->typepos);
-					np = hs->position;
+					newposition = hs->position;
 					hs->position++;
-					if (hs->position < 11) {
+					if (hs->position < 11) 
+					{
 						ircsnprintf(hs->typepos, 6, "%s%d", "M", hs->position);
 						DBAStore( "Scores", hs->typepos, (void*)hs, sizeof(HighScoreData));
 					} else {
@@ -322,11 +343,12 @@ void checkhighscorelists(Channel *c) {
 			}
 			ln = list_prev(highscores, ln);
 		}
-		if (np < 11) {
+		if (newposition < 11) 
+		{
 			hs = ns_calloc(sizeof(HighScoreData));
-			ircsnprintf(hs->typepos, 6, "%s%d", "M", np);
+			ircsnprintf(hs->typepos, 6, "%s%d", "M", newposition);
 			hs->type = 'M';
-			hs->position = np;
+			hs->position = newposition;
 			strlcpy(hs->name, gd->pd[i]->u->name, MAXNICK);
 			hs->score = gd->pd[i]->score;
 			hs->changed = 0;
@@ -334,20 +356,23 @@ void checkhighscorelists(Channel *c) {
 			hs->changed = YS_SCORE_NEW;
 			lnode_create_append( highscores, hs );
 		}
-		np = 1;
+		newposition = 1;
 		list_sort(highscores, sortlistbytypepos);
 		ln = list_last(highscores);
-		while (ln != NULL) {
+		while (ln) 
+		{
 			hs = lnode_get(ln);
-			if (hs->typepos[0] == 'O') {
-				if (np == 1) {
-					np = (hs->position + 1);
-				}
-				if (hs->score < gd->pd[i]->score) {
+			if (hs->typepos[0] == 'O') 
+			{
+				if (newposition == 1)
+					newposition = (hs->position + 1);
+				if (hs->score < gd->pd[i]->score) 
+				{
 					DBADelete( "Scores", hs->typepos);
-					np = hs->position;
+					newposition = hs->position;
 					hs->position++;
-					if (hs->position < 101) {
+					if (hs->position < 101) 
+					{
 						ircsnprintf(hs->typepos, 6, "%s%d", "O", hs->position);
 						DBAStore( "Scores", hs->typepos, (void*)hs, sizeof(HighScoreData));
 					} else {
@@ -362,11 +387,12 @@ void checkhighscorelists(Channel *c) {
 			}
 			ln = list_prev(highscores, ln);
 		}
-		if (np < 101) {
+		if (newposition < 101) 
+		{
 			hs = ns_calloc(sizeof(HighScoreData));
-			ircsnprintf(hs->typepos, 6, "%s%d", "O", np);
+			ircsnprintf(hs->typepos, 6, "%s%d", "O", newposition);
 			hs->type = 'O';
-			hs->position = np;
+			hs->position = newposition;
 			strlcpy(hs->name, gd->pd[i]->u->name, MAXNICK);
 			hs->score = gd->pd[i]->score;
 			hs->changed = 0;
@@ -377,12 +403,16 @@ void checkhighscorelists(Channel *c) {
 	}
 	list_sort(highscores, sortlistbytypepos);
 	ln = list_first(highscores);
-	while (ln != NULL) {
+	while (ln) {
 		hs = lnode_get(ln);
-		if (hs->changed == YS_SCORE_NEW) {
-			for (i = 0 ; i < gd->playercount ; i++) {
-				if (!ircstrcasecmp(gd->pd[i]->u->name, hs->name)) {
-					if (hs->type == 'D') {
+		if (hs->changed == YS_SCORE_NEW) 
+		{
+			for (i = 0 ; i < gd->playercount ; i++) 
+			{
+				if (!ircstrcasecmp(gd->pd[i]->u->name, hs->name)) 
+				{
+					if (hs->type == 'D') 
+					{
 						irc_prefmsg (ys_bot, gd->pd[i]->u, "Congratulations, You are now on the Daily high score list at position %d", hs->position);
 					} else if (hs->type == 'W') {
 						irc_prefmsg (ys_bot, gd->pd[i]->u, "Congratulations, You are now on the Weekly high score list at position %d", hs->position);
@@ -390,11 +420,12 @@ void checkhighscorelists(Channel *c) {
 						irc_prefmsg (ys_bot, gd->pd[i]->u, "Congratulations, You are now on the Monthly high score list at position %d", hs->position);
 					} else if (hs->type == 'O') {
 						irc_prefmsg (ys_bot, gd->pd[i]->u, "Congratulations, You are now on the Overall high score list at position %d", hs->position);
-						if (hs->position == 1) {
+						if (hs->position == 1) 
+						{
 							ln2 = list_next(highscores, ln);
 							hs2 = lnode_get(ln2);
 							irc_chanprivmsg (ys_bot, c->name, "\0037%s \0038now has the highest score, with\00311 %d \0038points, overtaking \0037%s\0038 who had\00311 %d \0038points.", hs->name, hs->score, hs2->name, hs2->score);
-							nhs = 1;
+							newhighscore = 1;
 						}
 					}
 				}
@@ -403,11 +434,14 @@ void checkhighscorelists(Channel *c) {
 		}
 		ln = list_next(highscores, ln);
 	}
-	if (!nhs) {
+	if (!newhighscore) 
+	{
 		ln = list_first(highscores);
-		while (ln != NULL) {
+		while (ln) 
+		{
 			hs = lnode_get(ln);
-			if (hs->type == 'O' && hs->position == 1) {
+			if (hs->type == 'O' && hs->position == 1) 
+			{
 				irc_chanprivmsg (ys_bot, c->name, "\0037%s \0038still has the highest score, with\00311 %d \0038points.", hs->name, hs->score);
 				break;
 			}

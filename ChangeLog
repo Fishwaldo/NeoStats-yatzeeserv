@@ -2,6 +2,9 @@ YahtzeeServ Module for NeoStats Changelog.
 Fish (F), Mark (M), DeadNotBuried (D)
 ==============================================================================
 3.0.a3-dev
+ - add segfault locations (D)
+ - Remove verbose option (D)
+ - Add highscore_report helper function to manage messaging. (D)
  - ensure set chan target not currently hosting a game, and other checks
    to ensure it is safe to change channels (D)
  - fix bug not adding to high score lists when lists not full (D)
