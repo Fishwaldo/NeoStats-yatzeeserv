@@ -369,6 +369,15 @@ int ScoreYahtzeeDice (CmdParams* cmdparams)
 				crs = 25;
 			else
 				crs = 0;
+			/* allow for Yahtzee to substitute */
+			if ((!crs) && (gd->pd[gd->currentplayer]->hand[12] == 50))
+			{
+				for (i = 0; i < 6; i++) 
+				{
+					if (dtsc[i] == 5) 
+						crs = 25;
+				}
+			}
 		}
 	} else if (!ircstrcasecmp(cmdparams->av[0], "ss") || !ircstrcasecmp(cmdparams->av[0], "short") || !ircstrcasecmp(cmdparams->av[0], "small")) {
 		stt= 7;
@@ -390,6 +399,15 @@ int ScoreYahtzeeDice (CmdParams* cmdparams)
 				crs = 30;
 			else
 				crs = 0;
+			/* allow for Yahtzee to substitute */
+			if ((!crs) && (gd->pd[gd->currentplayer]->hand[12] == 50))
+			{
+				for (i = 0; i < 6; i++) 
+				{
+					if (dtsc[i] == 5) 
+						crs = 30;
+				}
+			}
 		}
 	} else if (!ircstrcasecmp(cmdparams->av[0], "ls") || !ircstrcasecmp(cmdparams->av[0], "long") || !ircstrcasecmp(cmdparams->av[0], "large")) {
 		stt= 8;
@@ -399,6 +417,15 @@ int ScoreYahtzeeDice (CmdParams* cmdparams)
 		} else {
 			if ((dtsc[1] == 1) && (dtsc[2] == 1) && (dtsc[3] == 1) && (dtsc[4] == 1))
 				crs = 40;
+			/* allow for Yahtzee to substitute */
+			if ((!crs) && (gd->pd[gd->currentplayer]->hand[12] == 50))
+			{
+				for (i = 0; i < 6; i++) 
+				{
+					if (dtsc[i] == 5) 
+						crs = 40;
+				}
+			}
 		}
 	} else if (!ircstrcasecmp(cmdparams->av[0], "3k")) {
 		stt= 9;
@@ -472,7 +499,8 @@ int ScoreYahtzeeDice (CmdParams* cmdparams)
 	gd->pd[gd->currentplayer]->hand[stt] = crs;
 	irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0037%s\0039 scored\00311 %d\0039 on \00311%s", cmdparams->source->name, crs, ysscoretype[stt]);
 	gd->pd[gd->currentplayer]->score += crs;
-	if (stt != 12 && gd->pd[gd->currentplayer]->hand[12] == 50 && crs) 
+	/* check for Yahtzee Bonus on all except fh ss ls and y */
+	if ((stt < 6 || stt > 8) && stt != 12 && gd->pd[gd->currentplayer]->hand[12] == 50 && crs) 
 	{
 		for (i = 0; i < 6; i++) 
 		{
