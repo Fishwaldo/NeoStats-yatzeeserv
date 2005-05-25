@@ -43,23 +43,8 @@ const char *ys_help_set_chanoponly[] = {
 	NULL
 };
 
-const char ys_help_start_oneline[] = "Start Game";
-const char ys_help_stop_oneline[] = "Stops Game";
-const char ys_help_join_oneline[] = "Join a game currently Starting";
-const char ys_help_remove_oneline[] = "Remove From Game";
-const char ys_help_players_oneline[] = "Display Player List In Channel";
-const char ys_help_turn_oneline[] = "Display Current Player In Channel";
-const char ys_help_pass_oneline[] = "Passes game to the specified nick";
-const char ys_help_dice_oneline[] = "Shows your currently rolled dice";
-const char ys_help_sheet_oneline[] = "Shows yuour current score sheet";
-const char ys_help_roll_oneline[] = "Rolls the specified Dice, keeping the rest";
-const char ys_help_keep_oneline[] = "Keeps the specified Dice, and rolls the rest";
-const char ys_help_score_oneline[] = "Scores to the entry on the score sheet";
-const char ys_help_top10_oneline[] = "Shows the Top 10 Score Lists in channel";
-const char ys_help_high_oneline[] = "Displays the Overall High Score Page Selected, In Channel";
-const char ys_help_rules_oneline[] = "Displays the rules pages";
-
 const char *ys_help_start[] = {
+	"Start Game",
 	"Syntax: \2START\2",
 	"Syntax: \2START <#channel>\2",
 	"",
@@ -70,6 +55,7 @@ const char *ys_help_start[] = {
 };
 
 const char *ys_help_stop[] = {
+	"Stops Game",
 	"Syntax: \2STOP\2",
 	"",
 	"Stops Currently Running Yahtzee Game.",
@@ -84,6 +70,7 @@ const char *ys_help_stop[] = {
 };
 
 const char *ys_help_join[] = {
+	"Join a game currently Starting",
 	"Syntax: \2JOIN\2",
 	"",
 	"Joins you to the Currently Starting Game.",
@@ -97,6 +84,7 @@ const char *ys_help_join[] = {
 };
 
 const char *ys_help_remove[] = {
+	"Remove From Game",
 	"Syntax: \2REMOVE\2",
 	"Syntax: \2REMOVE <nick>\2 (ChanOP/IRCop Only)",
 	"",
@@ -109,6 +97,7 @@ const char *ys_help_remove[] = {
 };
 
 const char *ys_help_players[] = {
+	"Display Player List In Channel",
 	"Syntax: \2PLAYERS\2",
 	"",
 	"Displays List of Current Players in channel.",
@@ -118,6 +107,7 @@ const char *ys_help_players[] = {
 };
 
 const char *ys_help_turn[] = {
+	"Display Current Player In Channel",
 	"Syntax: \2TURN\2",
 	"",
 	"Shows Current Player waiting to roll dice, or score.",
@@ -127,6 +117,7 @@ const char *ys_help_turn[] = {
 };
 
 const char *ys_help_pass[] = {
+	"Passes game to the specified nick",
 	"Syntax: \2PASS\2 <nick>",
 	"",
 	"Passes your game to nick. the nick MUST be",
@@ -137,6 +128,7 @@ const char *ys_help_pass[] = {
 };
 
 const char *ys_help_dice[] = {
+	"Shows your currently rolled dice",
 	"Syntax: \2DICE\2",
 	"",
 	"Shows the dice you have currently",
@@ -147,6 +139,7 @@ const char *ys_help_dice[] = {
 };
 
 const char *ys_help_sheet[] = {
+	"Shows your current score sheet",
 	"Syntax: \2SHEET\2",
 	"",
 	"Shows your current Score Sheet in channel",
@@ -156,6 +149,7 @@ const char *ys_help_sheet[] = {
 };
 
 const char *ys_help_roll[] = {
+	"Rolls the specified Dice, keeping the rest",
 	"Syntax: \2ROLL\2 <#> <#> <#> <#> <#>",
 	"",
 	"Rolls the specified Dice",
@@ -168,6 +162,7 @@ const char *ys_help_roll[] = {
 };
 
 const char *ys_help_keep[] = {
+	"Keeps the specified Dice, and rolls the rest",
 	"Syntax: \2KEEP\2 <#> <#> <#> <#> <#>",
 	"",
 	"Keeps the specified Dice, and rolls the rest",
@@ -180,6 +175,7 @@ const char *ys_help_keep[] = {
 };
 
 const char *ys_help_score[] = {
+	"Scores to the entry on the score sheet",
 	"Syntax: \2SCORE\2 <entry>",
 	"",
 	"Scores to the specified entry on the score sheet",
@@ -193,6 +189,7 @@ const char *ys_help_score[] = {
 };
 
 const char *ys_help_top10[] = {
+	"Shows the Top 10 Score Lists in channel",
 	"Syntax: \2TOP10 <?>\2",
 	"",
 	"Displays the Top 10 Score Lists in channel",
@@ -205,6 +202,7 @@ const char *ys_help_top10[] = {
 };
 
 const char *ys_help_high[] = {
+	"Displays the Overall High Score Page Selected, In Channel",
 	"Syntax: \2HIGH\2 <#>",
 	"",
 	"Displays the Overall High Score Page Specified, in Channel",
@@ -213,6 +211,7 @@ const char *ys_help_high[] = {
 };
 
 const char *ys_help_rules[] = {
+	"Displays the rules pages",
 	"Syntax: \2RULES\2 <#>",
 	"",
 	"Displays the selected Rules Page",

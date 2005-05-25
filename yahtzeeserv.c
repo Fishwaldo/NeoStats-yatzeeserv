@@ -43,22 +43,22 @@ const char *ys_about[] = {
 */
 static bot_cmd ys_commands[]=
 {
-	{"START",	StartYahtzeeGame,	0,	0,	ys_help_start,		ys_help_start_oneline},
-	{"STOP",	StopYahtzeeGame,	0,	0,	ys_help_stop,		ys_help_stop_oneline,		CMD_FLAG_CHANONLY},
-	{"JOIN",	JoinYahtzeeGame,	0,	0,	ys_help_join,		ys_help_join_oneline,		CMD_FLAG_CHANONLY},
-	{"REMOVE",	RemoveYahtzeeGame,	0,	0,	ys_help_remove,		ys_help_remove_oneline,		CMD_FLAG_CHANONLY},
-	{"PLAYERS",	ShowPlayersYahtzeeGame,	0,	0,	ys_help_players,	ys_help_players_oneline,	CMD_FLAG_CHANONLY},
-	{"TURN",	ShowTurnYahtzeeGame,	0,	0,	ys_help_turn,		ys_help_turn_oneline,		CMD_FLAG_CHANONLY},
-	{"PASS",	PassYahtzeeGame,	1,	0,	ys_help_pass,		ys_help_pass_oneline,		CMD_FLAG_CHANONLY},
-	{"DICE",	ShowYahtzeeDice,	0,	0,	ys_help_dice,		ys_help_dice_oneline,		CMD_FLAG_CHANONLY},
-	{"SHEET",	ShowYahtzeeSheet,	0,	0,	ys_help_sheet,		ys_help_sheet_oneline,		CMD_FLAG_CHANONLY},
-	{"ROLL",	RollYahtzeeDice,	0,	0,	ys_help_roll,		ys_help_roll_oneline,		CMD_FLAG_CHANONLY},
-	{"KEEP",	KeepYahtzeeDice,	0,	0,	ys_help_keep,		ys_help_keep_oneline,		CMD_FLAG_CHANONLY},
-	{"SCORE",	ScoreYahtzeeDice,	1,	0,	ys_help_score,		ys_help_score_oneline,		CMD_FLAG_CHANONLY},
-	{"TOP10",	ShowTop10Lists,		0,	0,	ys_help_top10,		ys_help_top10_oneline},
-	{"HIGH",	ShowHighList,		0,	0,	ys_help_high,		ys_help_high_oneline},
-	{"RULES",	ShowRulePages,		0,	0,	ys_help_rules,		ys_help_rules_oneline},
-	{NULL,		NULL,			0, 	0,	NULL,			NULL}
+	{"START",	StartYahtzeeGame,	0,	0,	ys_help_start},
+	{"STOP",	StopYahtzeeGame,	0,	0,	ys_help_stop,		CMD_FLAG_CHANONLY},
+	{"JOIN",	JoinYahtzeeGame,	0,	0,	ys_help_join,		CMD_FLAG_CHANONLY},
+	{"REMOVE",	RemoveYahtzeeGame,	0,	0,	ys_help_remove,		CMD_FLAG_CHANONLY},
+	{"PLAYERS",	ShowPlayersYahtzeeGame,	0,	0,	ys_help_players,	CMD_FLAG_CHANONLY},
+	{"TURN",	ShowTurnYahtzeeGame,	0,	0,	ys_help_turn,		CMD_FLAG_CHANONLY},
+	{"PASS",	PassYahtzeeGame,	1,	0,	ys_help_pass,		CMD_FLAG_CHANONLY},
+	{"DICE",	ShowYahtzeeDice,	0,	0,	ys_help_dice,		CMD_FLAG_CHANONLY},
+	{"SHEET",	ShowYahtzeeSheet,	0,	0,	ys_help_sheet,		CMD_FLAG_CHANONLY},
+	{"ROLL",	RollYahtzeeDice,	0,	0,	ys_help_roll,		CMD_FLAG_CHANONLY},
+	{"KEEP",	KeepYahtzeeDice,	0,	0,	ys_help_keep,		CMD_FLAG_CHANONLY},
+	{"SCORE",	ScoreYahtzeeDice,	1,	0,	ys_help_score,		CMD_FLAG_CHANONLY},
+	{"TOP10",	ShowTop10Lists,		0,	0,	ys_help_top10},
+	{"HIGH",	ShowHighList,		0,	0,	ys_help_high},
+	{"RULES",	ShowRulePages,		0,	0,	ys_help_rules},
+	{NULL,		NULL,			0, 	0,	NULL}
 };
 
 static bot_setting ys_settings[]=
