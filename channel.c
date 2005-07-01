@@ -91,7 +91,6 @@ void CreateChannelGameData(Channel *c)
 {
 	GameData *gd;
 	int i;
-	int i2;
 	
 	gd = ns_calloc(sizeof(GameData));
 	gd->gamestatus = YS_GAME_STOPPED;
