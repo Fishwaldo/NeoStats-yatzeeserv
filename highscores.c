@@ -1,5 +1,5 @@
 /* YahtzeeServ - Yahtzee Game Service - NeoStats Addon Module
-** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, DeadNotBuried
+** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, Jeff Lang
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ int sortlistbytypepos( const void *key1, const void *key2 )
 /*
  * Select High Scores to remove
 */
-int yahtzeeday(void) 
+int yahtzeeday(void *userptr) 
 {
 	SET_SEGV_LOCATION();
 	irc_chanalert (ys_bot, "\0038It's Midnight Here : \0037Clearing Daily Top 10 List");
@@ -163,7 +163,7 @@ int yahtzeeday(void)
 	return NS_SUCCESS;
 }
 
-int yahtzeeweek(void) 
+int yahtzeeweek(void *userptr) 
 {
 	SET_SEGV_LOCATION();
 	irc_chanalert (ys_bot, "\0038It's Sunday Here : \0037Clearing Weekly Top 10 List");
@@ -172,7 +172,7 @@ int yahtzeeweek(void)
 	return NS_SUCCESS;
 }
 
-int yahtzeemonth(void) 
+int yahtzeemonth(void *userptr) 
 {
 	SET_SEGV_LOCATION();
 	irc_chanalert (ys_bot, "\0038It's The First Here : \0037Clearing Monthly Top 10 List");

@@ -1,5 +1,5 @@
 /* YahtzeeServ - Yahtzee Game Service - NeoStats Addon Module
-** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, DeadNotBuried
+** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, Jeff Lang
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -159,10 +159,10 @@ int ModInit( void )
 	ysscoretype[13]= "Bonus";
 	ysscoretype[14]= "Yahtzee Bonus";
 	ModuleConfig (ys_settings);
-	AddTimer (TIMER_TYPE_DAILY, yahtzeeday, "yahtzeeday", 0);
-	AddTimer (TIMER_TYPE_WEEKLY, yahtzeeweek, "yahtzeeweek", 0);
-	AddTimer (TIMER_TYPE_MONTHLY, yahtzeemonth, "yahtzeemonth", 0);
-	AddTimer (TIMER_TYPE_INTERVAL, yahtzeetimer, "yahtzeetimer", 5);
+	AddTimer (TIMER_TYPE_DAILY, yahtzeeday, "yahtzeeday", 0, NULL);
+	AddTimer (TIMER_TYPE_WEEKLY, yahtzeeweek, "yahtzeeweek", 0, NULL);
+	AddTimer (TIMER_TYPE_MONTHLY, yahtzeemonth, "yahtzeemonth", 0, NULL);
+	AddTimer (TIMER_TYPE_INTERVAL, yahtzeetimer, "yahtzeetimer", 5, NULL);
 	loadyahtzeescores();
 	return NS_SUCCESS;
 }

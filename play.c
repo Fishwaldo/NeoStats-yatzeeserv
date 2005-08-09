@@ -1,5 +1,5 @@
 /* YahtzeeServ - Yahtzee Game Service - NeoStats Addon Module
-** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, DeadNotBuried
+** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, Jeff Lang
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ int StartYahtzeeGame (CmdParams* cmdparams)
  * if game if due to start, checks for joined users
  * if users joined starts game, if not end game.
 */
-int yahtzeetimer(void) 
+int yahtzeetimer(void *userptr) 
 {
 	lnode_t *ln, *ln2;
 	GameData *gd;

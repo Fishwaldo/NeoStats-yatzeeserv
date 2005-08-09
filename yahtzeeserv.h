@@ -1,5 +1,5 @@
 /* YahtzeeServ - Yahtzee Game Service - NeoStats Addon Module
-** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, DeadNotBuried
+** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, Jeff Lang
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -125,9 +125,9 @@ int ShowTop10Lists (CmdParams* cmdparams);
 void loadyahtzeescores(void);
 int loadhighscores(void *data, int size);
 int sortlistbytypepos( const void *key1, const void *key2 );
-int yahtzeeday(void);
-int yahtzeeweek(void);
-int yahtzeemonth(void);
+int yahtzeeday(void *userptr);
+int yahtzeeweek(void *userptr);
+int yahtzeemonth(void *userptr);
 void clearyahtzeescores(int stc);
 void checkhighscorelists(Channel*c);
 
@@ -145,7 +145,7 @@ int CheckPlayerKill (CmdParams *cmdparams);
 
 /* play.c */
 int StartYahtzeeGame (CmdParams* cmdparams);
-int yahtzeetimer(void);
+int yahtzeetimer(void *userptr);
 int JoinYahtzeeGame (CmdParams* cmdparams);
 int RemoveYahtzeeGame (CmdParams* cmdparams);
 void removenickfromgame(Channel *c, Client *u);
