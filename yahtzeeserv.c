@@ -58,7 +58,7 @@ static bot_cmd ys_commands[]=
 	{"TOP10",	ShowTop10Lists,		0,	0,	ys_help_top10},
 	{"HIGH",	ShowHighList,		0,	0,	ys_help_high},
 	{"RULES",	ShowRulePages,		0,	0,	ys_help_rules},
-	{NULL,		NULL,			0, 	0,	NULL}
+	NS_CMD_END()
 };
 
 static bot_setting ys_settings[]=
@@ -67,7 +67,7 @@ static bot_setting ys_settings[]=
 	{"CHAN",	&YahtzeeServ.yahtzeeroom,	SET_TYPE_CHANNEL,	0,	MAXCHANLEN,	NS_ULEVEL_ADMIN,	NULL,	ys_help_set_chan,	ys_cmd_set_chan,	(void *)"#Games_Yahtzee" },
 	{"MULTICHAN",	&YahtzeeServ.multichan,		SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_multichan,	NULL,			(void *)0 },
 	{"CHANOPONLY",	&YahtzeeServ.chanoponly,	SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_chanoponly,	NULL,			(void *)0 },
-	{NULL,		NULL,				0,			0,	0,		0,			NULL,	NULL,			NULL, 			NULL },
+	NS_SETTING_END()
 };
 
 /*
