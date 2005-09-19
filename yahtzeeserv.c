@@ -95,7 +95,7 @@ ModuleEvent module_events[] = {
 	{EVENT_LOCALKILL,	CheckPlayerKill},
 	{EVENT_PART,		CheckPlayerPart},
 	{EVENT_KICK,		CheckPlayerKick},
-	{EVENT_NULL, NULL}
+	NS_EVENT_END()
 };
 
 /** BotInfo */
