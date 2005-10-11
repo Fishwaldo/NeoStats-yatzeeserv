@@ -133,7 +133,7 @@ int ModSynch (void)
 	irc_chanalert (ys_bot, "Game will start in %s", YahtzeeServ.yahtzeeroom);
 	irc_join (ys_bot, YahtzeeServ.yahtzeeroom, "+o");
 	c = FindChannel(YahtzeeServ.yahtzeeroom);
-	gamelist = list_create( -1 );
+	gamelist = list_create( LISTCOUNT_T_MAX );
 	CreateChannelGameData(c);
 	return NS_SUCCESS;
 };

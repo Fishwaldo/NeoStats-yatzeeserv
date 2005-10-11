@@ -121,7 +121,7 @@ int ShowTop10Lists (CmdParams* cmdparams) {
 */
 void loadyahtzeescores(void) 
 {
-	highscores = list_create( -1 );
+	highscores = list_create( LISTCOUNT_T_MAX );
 	DBAFetchRows("Scores", loadhighscores);
 	list_sort(highscores, sortlistbytypepos);
 }
