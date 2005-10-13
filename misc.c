@@ -26,7 +26,7 @@
 /*
  * Display Rules
 */
-int ShowRulePages (CmdParams* cmdparams)
+int ShowRulePages (const CmdParams *cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if (cmdparams->ac < 1) 
@@ -52,7 +52,7 @@ int ShowRulePages (CmdParams* cmdparams)
 /*
  * Pass Game To Another User
 */
-int PassYahtzeeGame (CmdParams* cmdparams)
+int PassYahtzeeGame (const CmdParams *cmdparams)
 {
 	GameData *gd;
 	Client *u;
@@ -101,7 +101,7 @@ int PassYahtzeeGame (CmdParams* cmdparams)
 /*
  * Display Current Players
 */
-int ShowPlayersYahtzeeGame (CmdParams* cmdparams)
+int ShowPlayersYahtzeeGame (const CmdParams *cmdparams)
 {
 	GameData *gd;
 
@@ -117,7 +117,7 @@ int ShowPlayersYahtzeeGame (CmdParams* cmdparams)
 /*
  * Display Current Players Turn
 */
-int ShowTurnYahtzeeGame (CmdParams* cmdparams)
+int ShowTurnYahtzeeGame (const CmdParams *cmdparams)
 {
 	GameData *gd;
 
@@ -133,7 +133,7 @@ int ShowTurnYahtzeeGame (CmdParams* cmdparams)
 /*
  * Show Players Score Sheet
 */
-int ShowYahtzeeSheet (CmdParams* cmdparams)
+int ShowYahtzeeSheet (const CmdParams *cmdparams)
 {
 	GameData *gd;
 	int i;
@@ -165,7 +165,7 @@ int ShowYahtzeeSheet (CmdParams* cmdparams)
 /*
  * Display The Last Rolled Dice
 */
-int ShowYahtzeeDice (CmdParams* cmdparams)
+int ShowYahtzeeDice (const CmdParams *cmdparams)
 {
 	GameData *gd;
 	int i;
@@ -206,21 +206,21 @@ int ShowYahtzeeDice (CmdParams* cmdparams)
  * check if user is a Yahtzee Player
  * and if so, remove from games as appropriate
 */
-int CheckPlayerPart (CmdParams *cmdparams) {
+int CheckPlayerPart (const CmdParams *cmdparams) {
 	SET_SEGV_LOCATION();
 	if (GetUserModValue(cmdparams->source) > 0)
 		removenickfromgame(cmdparams->channel, cmdparams->source);
 	return NS_SUCCESS;
 }
 
-int CheckPlayerKick (CmdParams *cmdparams) {
+int CheckPlayerKick (const CmdParams *cmdparams) {
 	SET_SEGV_LOCATION();
 	if (GetUserModValue(cmdparams->target) > 0)
 		removenickfromgame(cmdparams->channel, cmdparams->target);
 	return NS_SUCCESS;
 }
 
-int CheckPlayerQuit (CmdParams *cmdparams) {
+int CheckPlayerQuit (const CmdParams *cmdparams) {
 	GameData *gd;
 	Channel *c;
 	lnode_t	*ln;
@@ -241,7 +241,7 @@ int CheckPlayerQuit (CmdParams *cmdparams) {
 	return NS_SUCCESS;
 }
 
-int CheckPlayerKill (CmdParams *cmdparams) 
+int CheckPlayerKill (const CmdParams *cmdparams) 
 {
 	GameData *gd;
 	Channel *c;

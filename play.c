@@ -26,7 +26,7 @@
 /*
  * Start Game
 */
-int StartYahtzeeGame (CmdParams* cmdparams)
+int StartYahtzeeGame (const CmdParams *cmdparams)
 {
 	GameData *gd;
 	Channel *c;
@@ -57,7 +57,7 @@ int StartYahtzeeGame (CmdParams* cmdparams)
 			irc_prefmsg (ys_bot, cmdparams->source, "You are not currently in %s. Unable to start.", c->name);
 			return NS_SUCCESS;
 		}
-		if ( YahtzeeServ.chanoponly && !IsChanOp(c->name, cmdparams->source->name)) 
+		if ( YahtzeeServ.chanoponly && !IsChanOp(c, cmdparams->source)) 
 		{
 			irc_prefmsg (ys_bot, cmdparams->source, "Currently only Channel Ops may start games outside the main game channel.");
 			return NS_SUCCESS;
@@ -142,7 +142,7 @@ int yahtzeetimer(void *userptr)
 /*
  * Join Player To Game
 */
-int JoinYahtzeeGame (CmdParams* cmdparams) {
+int JoinYahtzeeGame (const CmdParams *cmdparams) {
 	GameData *gd;
 	int i;
 	
@@ -179,12 +179,12 @@ int JoinYahtzeeGame (CmdParams* cmdparams) {
 /*
  * Remove Player
 */
-int RemoveYahtzeeGame (CmdParams* cmdparams)
+int RemoveYahtzeeGame (const CmdParams *cmdparams)
 {
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	if (cmdparams->ac > 0 && (cmdparams->source->user->ulevel >= NS_ULEVEL_LOCOPER || IsChanOp(cmdparams->channel->name, cmdparams->source->name))) 
+	if (cmdparams->ac > 0 && (cmdparams->source->user->ulevel >= NS_ULEVEL_LOCOPER || IsChanOp(cmdparams->channel, cmdparams->source))) 
 	{
 		u = FindUser(cmdparams->av[0]);
 		if (!u)
@@ -269,19 +269,19 @@ void removenickfromgame(Channel *c, Client *u) {
 /*
  * Stop Game
 */
-int StopYahtzeeGame (CmdParams* cmdparams)
+int StopYahtzeeGame (const CmdParams *cmdparams)
 {
 	GameData *gd;
 
 	SET_SEGV_LOCATION();
-	if (!GetUserModValue(cmdparams->source) && cmdparams->source->user->ulevel < NS_ULEVEL_LOCOPER && !IsChanOp(cmdparams->channel->name, cmdparams->source->name))
+	if (!GetUserModValue(cmdparams->source) && cmdparams->source->user->ulevel < NS_ULEVEL_LOCOPER && !IsChanOp(cmdparams->channel, cmdparams->source))
 		return NS_SUCCESS;
 	gd = (GameData *)GetChannelModValue(cmdparams->channel);
 	if (!gd)
 		return NS_SUCCESS;
 	if (gd->gamestatus != YS_GAME_STARTING && gd->gamestatus != YS_GAME_PLAYING)
 		return NS_SUCCESS;
-	if (gd->playercount != 1 && cmdparams->source->user->ulevel < NS_ULEVEL_LOCOPER && !IsChanOp(cmdparams->channel->name, cmdparams->source->name)) 
+	if (gd->playercount != 1 && cmdparams->source->user->ulevel < NS_ULEVEL_LOCOPER && !IsChanOp(cmdparams->channel, cmdparams->source)) 
 	{
 		irc_chanprivmsg (ys_bot, cmdparams->channel->name, "\0034Unable to stop Yahtzee when more than one person playing, please use !remove if you wish to exit the game \0037%s.", cmdparams->source->name);
 		return NS_SUCCESS;
@@ -294,7 +294,7 @@ int StopYahtzeeGame (CmdParams* cmdparams)
 /*
  * Score to Sheet
 */
-int ScoreYahtzeeDice (CmdParams* cmdparams)
+int ScoreYahtzeeDice (const CmdParams *cmdparams)
 {
 	GameData *gd;
 	int i, crs, sa, stt;
@@ -596,7 +596,7 @@ void RollDice(Channel *c)
 /*
  * Roll Dice
 */
-int RollYahtzeeDice (CmdParams* cmdparams)
+int RollYahtzeeDice (const CmdParams *cmdparams)
 {
 	SET_SEGV_LOCATION();
 	reroll(cmdparams, 1);
@@ -606,7 +606,7 @@ int RollYahtzeeDice (CmdParams* cmdparams)
 /*
  * Keep Dice
 */
-int KeepYahtzeeDice (CmdParams* cmdparams)
+int KeepYahtzeeDice (const CmdParams *cmdparams)
 {
 	SET_SEGV_LOCATION();
 	reroll(cmdparams, 0);
@@ -616,7 +616,7 @@ int KeepYahtzeeDice (CmdParams* cmdparams)
 /* 
  * ReRolls Selected Dice
 */
-void reroll(CmdParams* cmdparams, int rolltype) 
+void reroll(const CmdParams *cmdparams, int rolltype) 
 {
 	GameData *gd;
 	char *buf;

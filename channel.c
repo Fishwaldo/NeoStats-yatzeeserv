@@ -26,7 +26,7 @@
 /*
  * Set Main Yahtzee Game Channel
 */
-int ys_cmd_set_chan(CmdParams* cmdparams, SET_REASON reason) 
+int ys_cmd_set_chan(const CmdParams *cmdparams, SET_REASON reason) 
 {
 	Channel *c, *c2;
 	GameData *gd, *gd2;

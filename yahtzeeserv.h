@@ -115,13 +115,13 @@ extern char dicetext[5][15];
 */
 
 /* channel.c */
-int ys_cmd_set_chan (CmdParams *cmdparams, SET_REASON reason);
+int ys_cmd_set_chan (const CmdParams *cmdparams, SET_REASON reason);
 void CreateChannelGameData(Channel *c);
 void RemoveChannelGameData(Channel *c, int fdc);
 
 /* highscores.c */
-int ShowHighList (CmdParams* cmdparams);
-int ShowTop10Lists (CmdParams* cmdparams);
+int ShowHighList (const CmdParams *cmdparams);
+int ShowTop10Lists (const CmdParams *cmdparams);
 void loadyahtzeescores(void);
 int loadhighscores(void *data, int size);
 int sortlistbytypepos( const void *key1, const void *key2 );
@@ -132,26 +132,26 @@ void clearyahtzeescores(int stc);
 void checkhighscorelists(Channel*c);
 
 /* misc.c */
-int ShowRulePages (CmdParams* cmdparams);
-int PassYahtzeeGame (CmdParams* cmdparams);
-int ShowPlayersYahtzeeGame (CmdParams* cmdparams);
-int ShowTurnYahtzeeGame (CmdParams* cmdparams);
-int ShowYahtzeeSheet (CmdParams* cmdparams);
-int ShowYahtzeeDice (CmdParams* cmdparams);
-int CheckPlayerPart (CmdParams *cmdparams);
-int CheckPlayerKick (CmdParams *cmdparams);
-int CheckPlayerQuit (CmdParams *cmdparams);
-int CheckPlayerKill (CmdParams *cmdparams);
+int ShowRulePages (const CmdParams *cmdparams);
+int PassYahtzeeGame (const CmdParams *cmdparams);
+int ShowPlayersYahtzeeGame (const CmdParams *cmdparams);
+int ShowTurnYahtzeeGame (const CmdParams *cmdparams);
+int ShowYahtzeeSheet (const CmdParams *cmdparams);
+int ShowYahtzeeDice (const CmdParams *cmdparams);
+int CheckPlayerPart (const CmdParams *cmdparams);
+int CheckPlayerKick (const CmdParams *cmdparams);
+int CheckPlayerQuit (const CmdParams *cmdparams);
+int CheckPlayerKill (const CmdParams *cmdparams);
 
 /* play.c */
-int StartYahtzeeGame (CmdParams* cmdparams);
+int StartYahtzeeGame (const CmdParams *cmdparams);
 int yahtzeetimer(void *userptr);
-int JoinYahtzeeGame (CmdParams* cmdparams);
-int RemoveYahtzeeGame (CmdParams* cmdparams);
+int JoinYahtzeeGame (const CmdParams *cmdparams);
+int RemoveYahtzeeGame (const CmdParams *cmdparams);
 void removenickfromgame(Channel *c, Client *u);
-int StopYahtzeeGame (CmdParams* cmdparams);
-int ScoreYahtzeeDice (CmdParams* cmdparams);
+int StopYahtzeeGame (const CmdParams *cmdparams);
+int ScoreYahtzeeDice (const CmdParams *cmdparams);
 void RollDice(Channel *c);
-int RollYahtzeeDice (CmdParams* cmdparams);
-int KeepYahtzeeDice (CmdParams* cmdparams);
-void reroll (CmdParams* cmdparams, int rolltype);
+int RollYahtzeeDice (const CmdParams *cmdparams);
+int KeepYahtzeeDice (const CmdParams *cmdparams);
+void reroll (const CmdParams *cmdparams, int rolltype);

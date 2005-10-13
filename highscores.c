@@ -29,7 +29,7 @@
  */
 static char highscore_report_buf[BUFSIZE];
 
-void highscore_report( CmdParams *cmdparams, const char *fmt, ... )
+void highscore_report( const CmdParams *cmdparams, const char *fmt, ... )
 {
 	va_list ap;
 
@@ -45,7 +45,7 @@ void highscore_report( CmdParams *cmdparams, const char *fmt, ... )
 /*
  * Display High Score Pages
 */
-int ShowHighList (CmdParams* cmdparams)
+int ShowHighList (const CmdParams *cmdparams)
 {
 	lnode_t *ln;
 	HighScoreData *hs;
@@ -78,7 +78,7 @@ int ShowHighList (CmdParams* cmdparams)
 /*
  * Display Top10 lists
 */
-int ShowTop10Lists (CmdParams* cmdparams) {
+int ShowTop10Lists (const CmdParams *cmdparams) {
 	lnode_t *ln;
 	HighScoreData *hs;
 	int i, showtype;
