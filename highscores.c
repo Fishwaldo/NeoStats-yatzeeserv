@@ -189,6 +189,7 @@ void clearyahtzeescores(int clearscore)
 	lnode_t *ln, *ln2;
 	HighScoreData *hs;
 
+	DBAOpenTable("Scores");
 	ln = list_first(highscores);
 	while (ln) 
 	{
@@ -206,6 +207,7 @@ void clearyahtzeescores(int clearscore)
 		}
 	}
 	list_sort(highscores, sortlistbytypepos);
+	DBACloseTable("Scores");
 }
 
 /*
@@ -221,6 +223,7 @@ void checkhighscorelists(Channel *c)
 	gd = (GameData *)GetChannelModValue(c);
 	if (!gd)
 		return;
+	DBAOpenTable("Scores");
 	newhighscore = 0;
 	for (i = 0 ; i < gd->playercount ; i++) 
 	{
@@ -402,6 +405,7 @@ void checkhighscorelists(Channel *c)
 		}
 	}
 	list_sort(highscores, sortlistbytypepos);
+	DBACloseTable("Scores");
 	ln = list_first(highscores);
 	while (ln) {
 		hs = lnode_get(ln);
