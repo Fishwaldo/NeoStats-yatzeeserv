@@ -11,6 +11,8 @@
 /configure -text
 /configure.in -text
 /highscores.c -text
+html/ys.tpl -text
+/htmlscores.c -text
 /install-sh -text
 /misc.c -text
 /modconfig.h.in -text

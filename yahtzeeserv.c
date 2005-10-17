@@ -43,30 +43,33 @@ const char *ys_about[] = {
 */
 static bot_cmd ys_commands[]=
 {
-	{"START",	StartYahtzeeGame,	0,	0,	ys_help_start},
-	{"STOP",	StopYahtzeeGame,	0,	0,	ys_help_stop,		CMD_FLAG_CHANONLY},
-	{"JOIN",	JoinYahtzeeGame,	0,	0,	ys_help_join,		CMD_FLAG_CHANONLY},
-	{"REMOVE",	RemoveYahtzeeGame,	0,	0,	ys_help_remove,		CMD_FLAG_CHANONLY},
-	{"PLAYERS",	ShowPlayersYahtzeeGame,	0,	0,	ys_help_players,	CMD_FLAG_CHANONLY},
-	{"TURN",	ShowTurnYahtzeeGame,	0,	0,	ys_help_turn,		CMD_FLAG_CHANONLY},
-	{"PASS",	PassYahtzeeGame,	1,	0,	ys_help_pass,		CMD_FLAG_CHANONLY},
-	{"DICE",	ShowYahtzeeDice,	0,	0,	ys_help_dice,		CMD_FLAG_CHANONLY},
-	{"SHEET",	ShowYahtzeeSheet,	0,	0,	ys_help_sheet,		CMD_FLAG_CHANONLY},
-	{"ROLL",	RollYahtzeeDice,	0,	0,	ys_help_roll,		CMD_FLAG_CHANONLY},
-	{"KEEP",	KeepYahtzeeDice,	0,	0,	ys_help_keep,		CMD_FLAG_CHANONLY},
-	{"SCORE",	ScoreYahtzeeDice,	1,	0,	ys_help_score,		CMD_FLAG_CHANONLY},
-	{"TOP10",	ShowTop10Lists,		0,	0,	ys_help_top10},
-	{"HIGH",	ShowHighList,		0,	0,	ys_help_high},
-	{"RULES",	ShowRulePages,		0,	0,	ys_help_rules},
+	{"START",	StartYahtzeeGame,	0,	0,			ys_help_start},
+	{"STOP",	StopYahtzeeGame,	0,	0,			ys_help_stop,		CMD_FLAG_CHANONLY},
+	{"JOIN",	JoinYahtzeeGame,	0,	0,			ys_help_join,		CMD_FLAG_CHANONLY},
+	{"REMOVE",	RemoveYahtzeeGame,	0,	0,			ys_help_remove,		CMD_FLAG_CHANONLY},
+	{"PLAYERS",	ShowPlayersYahtzeeGame,	0,	0,			ys_help_players,	CMD_FLAG_CHANONLY},
+	{"TURN",	ShowTurnYahtzeeGame,	0,	0,			ys_help_turn,		CMD_FLAG_CHANONLY},
+	{"PASS",	PassYahtzeeGame,	1,	0,			ys_help_pass,		CMD_FLAG_CHANONLY},
+	{"DICE",	ShowYahtzeeDice,	0,	0,			ys_help_dice,		CMD_FLAG_CHANONLY},
+	{"SHEET",	ShowYahtzeeSheet,	0,	0,			ys_help_sheet,		CMD_FLAG_CHANONLY},
+	{"ROLL",	RollYahtzeeDice,	0,	0,			ys_help_roll,		CMD_FLAG_CHANONLY},
+	{"KEEP",	KeepYahtzeeDice,	0,	0,			ys_help_keep,		CMD_FLAG_CHANONLY},
+	{"SCORE",	ScoreYahtzeeDice,	1,	0,			ys_help_score,		CMD_FLAG_CHANONLY},
+	{"TOP10",	ShowTop10Lists,		0,	0,			ys_help_top10},
+	{"HIGH",	ShowHighList,		0,	0,			ys_help_high},
+	{"RULES",	ShowRulePages,		0,	0,			ys_help_rules},
+	{"FORCEHTML",	ys_cmd_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ys_help_forcehtml},
 	NS_CMD_END()
 };
 
 static bot_setting ys_settings[]=
 {
-	{"EXCLUSIONS",	&YahtzeeServ.exclusions,	SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_exclusions,	NULL,			(void *)0 },
-	{"CHAN",	&YahtzeeServ.yahtzeeroom,	SET_TYPE_CHANNEL,	0,	MAXCHANLEN,	NS_ULEVEL_ADMIN,	NULL,	ys_help_set_chan,	ys_cmd_set_chan,	(void *)"#Games_Yahtzee" },
-	{"MULTICHAN",	&YahtzeeServ.multichan,		SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_multichan,	NULL,			(void *)0 },
-	{"CHANOPONLY",	&YahtzeeServ.chanoponly,	SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_chanoponly,	NULL,			(void *)0 },
+	{"EXCLUSIONS",	&YahtzeeServ.exclusions,	SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_exclusions,	NULL,			( void * )0 },
+	{"CHAN",	&YahtzeeServ.yahtzeeroom,	SET_TYPE_CHANNEL,	0,	MAXCHANLEN,	NS_ULEVEL_ADMIN,	NULL,	ys_help_set_chan,	ys_cmd_set_chan,	( void * )"#Games_Yahtzee" },
+	{"MULTICHAN",	&YahtzeeServ.multichan,		SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_multichan,	NULL,			( void * )0 },
+	{"CHANOPONLY",	&YahtzeeServ.chanoponly,	SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN,	NULL,	ys_help_set_chanoponly,	NULL,			( void * )0 },
+	{"HTML",	&YahtzeeServ.html,		SET_TYPE_BOOLEAN,	0, 	0, 		NS_ULEVEL_ADMIN, 	NULL,	ys_help_set_html,	ys_cmd_set_html,	( void * )0},
+	{"HTMLPATH",	&YahtzeeServ.htmlpath,		SET_TYPE_STRING,	0,	MAXPATH,	NS_ULEVEL_ADMIN, 	NULL,	ys_help_set_htmlpath,	ys_cmd_set_htmlpath,	( void * )""},
 	NS_SETTING_END()
 };
 
@@ -129,6 +132,8 @@ int ModSynch (void)
 	ys_bot = AddBot (&ys_botinfo);	
 	if (!ys_bot)
 		return NS_FAILURE;
+	if( YahtzeeServ.html )
+		ys_HTMLOutput();
 	srand((unsigned int)me.now);
 	irc_chanalert (ys_bot, "Game will start in %s", YahtzeeServ.yahtzeeroom);
 	irc_join (ys_bot, YahtzeeServ.yahtzeeroom, "+o");
@@ -176,5 +181,64 @@ int ModFini( void )
 	DelTimer ("yahtzeeweek");
 	DelTimer ("yahtzeemonth");
 	DelTimer ("yahtzeetimer");
+	return NS_SUCCESS;
+}
+
+/** @brief ys_cmd_set_html
+ *
+ *  Set callback for SET HTML
+ *  Enable or disable html output
+ *
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ys_cmd_set_html( const CmdParams *cmdparams, SET_REASON reason )
+{
+	if( reason == SET_CHANGE )
+	{
+		if( YahtzeeServ.html && YahtzeeServ.htmlpath[0] == 0 )
+		{
+			irc_prefmsg ( ys_bot, cmdparams->source, 
+				"You need to SET HTMLPATH. HTML output disabled." );
+			YahtzeeServ.html = 0;
+			return NS_SUCCESS;
+		}
+		if( YahtzeeServ.html && YahtzeeServ.htmlpath[0] != 0 )
+			ys_HTMLOutput();
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ys_cmd_set_htmlpath
+ *
+ *  Set callback for SET HTMLPATH
+ *  Change html output path
+ *
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ys_cmd_set_htmlpath( const CmdParams *cmdparams, SET_REASON reason )
+{
+	FILE *opf;
+
+	if( reason == SET_CHANGE )
+	{
+		opf = os_fopen( YahtzeeServ.htmlpath, "wt" );
+		if( !opf )
+		{
+			irc_prefmsg( ys_bot, cmdparams->source, 
+				"Failed to open HTML output file %s. Check file permissions. HTML output disabled.", YahtzeeServ.htmlpath );
+			return NS_SUCCESS;
+		}
+		os_fclose( opf );
+		if( YahtzeeServ.html )
+			ys_HTMLOutput();
+	}
 	return NS_SUCCESS;
 }

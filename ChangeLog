@@ -2,6 +2,7 @@ YahtzeeServ Module for NeoStats Changelog.
 Fish (F), Mark (M), DeadNotBuried (D)
 ==============================================================================
 3.0.a3-dev
+ - add HTML High Score page generation (D)
  - allow Yahtzee to substitue for Full House Short/Long Straight when
    yahtzee already scored 50 , No bonus points given. (D)
  - add segfault locations (D)

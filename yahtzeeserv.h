@@ -29,6 +29,8 @@ extern const char *ys_help_set_exclusions[];
 extern const char *ys_help_set_chan[];
 extern const char *ys_help_set_multichan[];
 extern const char *ys_help_set_chanoponly[];
+extern const char *ys_help_set_html[];
+extern const char *ys_help_set_htmlpath[];
 extern const char *ys_help_start[];
 extern const char *ys_help_stop[];
 extern const char *ys_help_join[];
@@ -49,6 +51,7 @@ extern const char *ys_help_rules_page_1[];
 extern const char *ys_help_rules_page_2[];
 extern const char *ys_help_rules_page_3[];
 extern const char *ys_help_rules_page_4[];
+extern const char *ys_help_forcehtml[];
 
 /*
  * Defines
@@ -74,6 +77,8 @@ struct YahtzeeServ {
 	int exclusions;
 	int multichan;
 	int chanoponly;
+	int html; 
+	char htmlpath[MAXPATH]; 
 } YahtzeeServ;
 
 typedef struct Players {
@@ -113,6 +118,10 @@ extern char dicetext[5][15];
 /*
  * Procedures
 */
+
+/* yahzteeserv.c */
+int ys_cmd_set_html( const CmdParams *cmdparams, SET_REASON reason );
+int ys_cmd_set_htmlpath( const CmdParams *cmdparams, SET_REASON reason );
 
 /* channel.c */
 int ys_cmd_set_chan (const CmdParams *cmdparams, SET_REASON reason);
@@ -155,3 +164,7 @@ void RollDice(Channel *c);
 int RollYahtzeeDice (const CmdParams *cmdparams);
 int KeepYahtzeeDice (const CmdParams *cmdparams);
 void reroll (const CmdParams *cmdparams, int rolltype);
+
+/* htmlscores */
+void ys_HTMLOutput( void );
+int ys_cmd_forcehtml( const CmdParams *cmdparams );

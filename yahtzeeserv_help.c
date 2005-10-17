@@ -43,6 +43,19 @@ const char *ys_help_set_chanoponly[] = {
 	NULL
 };
 
+const char *ys_help_set_htmlpath[] = {
+	"\2HTMLPATH <path>\2",
+	"Set the full pathname including filename used to write HTML",
+	"high scores when HTML is enabled",
+	NULL
+};
+
+const char *ys_help_set_html[] = {
+	"\2HTML <ON|OFF>\2",
+	"Enable or disable HTML High Scores generation.",
+	NULL
+};
+
 const char *ys_help_start[] = {
 	"Start Game",
 	"Syntax: \2START\2",
@@ -308,5 +321,13 @@ const char *ys_help_rules_page_4[] = {
 	"Yahtzee Bonus : If after Scoring 50 points on Yahtzee, another",
 	"Yahtzee is rolled a Bonus 100 points is added to your total.",
 	"NOTE: You must receive points when scoring to receive the Bonus.",
+	NULL
+};
+
+const char *ys_help_forcehtml[] = {
+	"Force output of the HTML High Scores",
+	"Syntax: \2FORCEHTML\2",
+	"",
+	"Forces an immediate update of the HTML High Scores output.",
 	NULL
 };

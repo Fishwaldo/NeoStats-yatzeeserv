@@ -208,6 +208,8 @@ void clearyahtzeescores(int clearscore)
 	}
 	list_sort(highscores, sortlistbytypepos);
 	DBACloseTable("Scores");
+	if( YahtzeeServ.html )
+		ys_HTMLOutput();
 }
 
 /*
@@ -451,6 +453,9 @@ void checkhighscorelists(Channel *c)
 			}
 			ln = list_next(highscores, ln);
 		}
+	} else {
+		if( YahtzeeServ.html )
+			ys_HTMLOutput();
 	}
 	return;
 }

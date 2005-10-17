@@ -8,13 +8,13 @@ INSTALL_DATA = @INSTALL_DATA@
 DIRECTORY = @DIRINST@/modules/
 INCLUDES = -I@DIRINST@/include/ -I.
 
-SRCS= yahtzeeserv.c yahtzeeserv_help.c play.c misc.c highscores.c channel.c
+SRCS= yahtzeeserv.c yahtzeeserv_help.c play.c misc.c highscores.c channel.c htmlscores.c
 OBJS= ${SRCS:.c=.o}
 TARGET= yahtzeeserv.so
 DOCS=README.YahtzeeServ
-DATA=
+DATA=html/ys.tpl
 SCRIPTS=
-DISTFILES=$(SRCS) $(DOCS) $(SCRIPTS) *.in configure install-sh ChangeLog *.h LICENSE RELNOTES yahtzeeserv.vcproj modconfigwin32.h
+DISTFILES=$(SRCS) $(DATA) $(DOCS) $(SCRIPTS) *.in configure install-sh ChangeLog *.h LICENSE RELNOTES yahtzeeserv.vcproj modconfigwin32.h
 DISTDIR= @PACKAGE@-@VERSION@
 
 all:	module
@@ -41,6 +41,7 @@ distclean:
 install: module
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)
 	$(INSTALL) -m 644 $(DOCS) $(DIRECTORY)../doc/
+	$(INSTALL) -m 644 $(DATA) $(DIRECTORY)../data/
 	@echo "Installation complete."
 	@echo "See the README file for instructions on loading this module."
 
