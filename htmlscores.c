@@ -125,16 +125,17 @@ static void html_highscores( void )
 {
 	lnode_t *ln;
 	HighScoreData *hs;
+	int i=0;
 
 	list_sort(highscores, sortlistbytypepos);
 	TABLE_START( opf );
-	os_fprintf( opf, "<tr><th>Nickname<b></b></th><th><b>Score</b></th></tr>\n" );
+	os_fprintf( opf, "<tr><th><b>Position</b></th><th><b>Nickname</b></th><th><b>Score</b></th></tr>\n" );
 	ln = list_first(highscores);
 	while (ln) 
 	{
 		hs = lnode_get(ln);
 		if (hs->type == 'O') 
-			os_fprintf( opf, "<tr><td>%s</td><td>%d</td>\n", hs->name, hs->score );
+			os_fprintf( opf, "<tr><td>%d</td><td>%s</td><td>%d</td>\n", ++i, hs->name, hs->score );
 		ln = list_next(highscores, ln);
 	}
 	TABLE_END( opf );
@@ -153,16 +154,17 @@ static void html_dailyscores( void )
 {
 	lnode_t *ln;
 	HighScoreData *hs;
+	int i=0;
 
 	list_sort(highscores, sortlistbytypepos);
 	TABLE_START( opf );
-	os_fprintf( opf, "<tr><th>Nickname<b></b></th><th><b>Score</b></th></tr>\n" );
+	os_fprintf( opf, "<tr><th><b>Position</b></th><th><b>Nickname</b></th><th><b>Score</b></th></tr>\n" );
 	ln = list_first(highscores);
 	while (ln) 
 	{
 		hs = lnode_get(ln);
 		if (hs->type == 'D') 
-			os_fprintf( opf, "<tr><td>%s</td><td>%d</td>\n", hs->name, hs->score );
+			os_fprintf( opf, "<tr><td>%d</td><td>%s</td><td>%d</td>\n", ++i, hs->name, hs->score );
 		ln = list_next(highscores, ln);
 	}
 	TABLE_END( opf );
@@ -181,16 +183,17 @@ static void html_weeklyscores( void )
 {
 	lnode_t *ln;
 	HighScoreData *hs;
+	int i=0;
 
 	list_sort(highscores, sortlistbytypepos);
 	TABLE_START( opf );
-	os_fprintf( opf, "<tr><th>Nickname<b></b></th><th><b>Score</b></th></tr>\n" );
+	os_fprintf( opf, "<tr><th><b>Position</b></th><th><b>Nickname</b></th><th><b>Score</b></th></tr>\n" );
 	ln = list_first(highscores);
 	while (ln) 
 	{
 		hs = lnode_get(ln);
 		if (hs->type == 'W') 
-			os_fprintf( opf, "<tr><td>%s</td><td>%d</td>\n", hs->name, hs->score );
+			os_fprintf( opf, "<tr><td>%d</td><td>%s</td><td>%d</td>\n", ++i, hs->name, hs->score );
 		ln = list_next(highscores, ln);
 	}
 	TABLE_END( opf );
@@ -209,16 +212,17 @@ static void html_monthlyscores( void )
 {
 	lnode_t *ln;
 	HighScoreData *hs;
+	int i=0;
 
 	list_sort(highscores, sortlistbytypepos);
 	TABLE_START( opf );
-	os_fprintf( opf, "<tr><th>Nickname<b></b></th><th><b>Score</b></th></tr>\n" );
+	os_fprintf( opf, "<tr><th><b>Position</b></th><th><b>Nickname</b></th><th><b>Score</b></th></tr>\n" );
 	ln = list_first(highscores);
 	while (ln) 
 	{
 		hs = lnode_get(ln);
 		if (hs->type == 'M') 
-			os_fprintf( opf, "<tr><td>%s</td><td>%d</td>\n", hs->name, hs->score );
+			os_fprintf( opf, "<tr><td>%d</td><td>%s</td><td>%d</td>\n", ++i, hs->name, hs->score );
 		ln = list_next(highscores, ln);
 	}
 	TABLE_END( opf );

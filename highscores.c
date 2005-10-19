@@ -220,7 +220,7 @@ void checkhighscorelists(Channel *c)
 	lnode_t *ln, *ln2;
 	HighScoreData *hs, *hs2;
 	GameData *gd;
-	int i, newposition, newhighscore;
+	int i, newposition, newhighscore, highscorelistschanged=0;
 
 	gd = (GameData *)GetChannelModValue(c);
 	if (!gd)
@@ -413,6 +413,7 @@ void checkhighscorelists(Channel *c)
 		hs = lnode_get(ln);
 		if (hs->changed == YS_SCORE_NEW) 
 		{
+			highscorelistschanged++;
 			for (i = 0 ; i < gd->playercount ; i++) 
 			{
 				if (!ircstrcasecmp(gd->pd[i]->u->name, hs->name)) 
@@ -453,9 +454,8 @@ void checkhighscorelists(Channel *c)
 			}
 			ln = list_next(highscores, ln);
 		}
-	} else {
-		if( YahtzeeServ.html )
-			ys_HTMLOutput();
 	}
+	if( highscorelistschanged && YahtzeeServ.html )
+			ys_HTMLOutput();
 	return;
 }
