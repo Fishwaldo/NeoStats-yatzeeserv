@@ -20,6 +20,8 @@
 ** $Id$
 */
 
+#include MODULECONFIG
+
 Bot *ys_bot;
 
 /*

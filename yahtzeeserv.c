@@ -82,7 +82,7 @@ ModuleInfo module_info = {
 	ys_copyright,
 	ys_about,
 	NEOSTATS_VERSION,
-	"3.0",
+	MODULE_VERSION,
 	__DATE__,
 	__TIME__,
 	MODULE_FLAG_LOCAL_EXCLUDES,
