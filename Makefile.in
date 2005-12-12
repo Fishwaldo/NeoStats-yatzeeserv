@@ -49,6 +49,7 @@ dist:
 	@echo -n "Creating directories"
 	@-rm -rf $(DISTDIR)
 	@mkdir $(DISTDIR)
+	@mkdir $(DISTDIR)/html
 	@echo "Done"
 	@echo -n "Copying distribution files"
 	@for file in $(DISTFILES); do \
