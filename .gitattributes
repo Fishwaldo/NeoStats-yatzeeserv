@@ -6,6 +6,8 @@
 /Makefile.in -text
 /NEWS -text
 /README.YahtzeeServ -text
+/README.YahtzeeServ.html -text
+/README.YahtzeeServ.xml -text
 /RELNOTES -text
 /channel.c -text
 /configure -text
