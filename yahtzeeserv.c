@@ -1,5 +1,5 @@
 /* YahtzeeServ - Yahtzee Game Service - NeoStats Addon Module
-** Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, Jeff Lang
+** Copyright (c) 2003-2006 Justin Hammond, Mark Hetherington, Jeff Lang
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 /** Copyright info */
 const char *ys_copyright[] = {
-	"Copyright (c) 2003-2005 Justin Hammond, Mark Hetherington, DeadNotBuried",
+	"Copyright (c) 2003-2006 Justin Hammond, Mark Hetherington, DeadNotBuried",
 	NULL
 };
 
