@@ -15,7 +15,7 @@ DOCS=README.YahtzeeServ
 DATA=html/ys.tpl
 SCRIPTS=
 DISTFILES=$(SRCS) $(DATA) $(DOCS) $(SCRIPTS) *.in configure install-sh ChangeLog *.h LICENSE RELNOTES yahtzeeserv.vcproj modconfigwin32.h
-DISTDIR= @PACKAGE@-@VERSION@
+DISTDIR= @DISTDIRVERSION@
 
 all:	module
 		@echo "Compilation complete."
