@@ -20,6 +20,7 @@ html/ys.tpl -text
 /modconfig.h.in -text
 /modconfigwin32.h -text
 /play.c -text
+/pulse.xml -text
 /yahtzeeserv.c -text
 /yahtzeeserv.h -text
 /yahtzeeserv.vcproj -text
