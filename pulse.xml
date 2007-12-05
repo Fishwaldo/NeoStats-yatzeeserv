@@ -22,7 +22,7 @@
             <make name="Build">
                 <process processor="${checkbuild.pp}"/>
             </make>
-            <make name="dist" targets="dist">
+            <make name="dist" targets="dist"/>
             <artifact name="SnapShot" file="YatzeeServ-*.tar.gz"/>
         </command>
     </recipe>
