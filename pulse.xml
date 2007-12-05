@@ -23,7 +23,7 @@
         </make>
         <command name="Dist">
             <make name="dist" targets="dist"/>
-            <artifact name="SnapShot" file="YatzeeServ-*.tar.gz"/>
+            <artifact name="SnapShot" file="YahtzeeServ-*.tar.gz"/>
         </command>
     </recipe>
     <recipe name="Win32-Build">
