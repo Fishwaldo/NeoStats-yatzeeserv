@@ -20,9 +20,15 @@
 ** $Id$
 */
 
-#include MODULECONFIG
+#ifndef YAHTZEESERV_H
+#define YAHTZEESERV_H
+#ifdef WIN32
+#include "modconfigwin32.h"
+#else
+#include "modconfig.h"
+#endif
 
-Bot *ys_bot;
+extern Bot *ys_bot;
 
 /*
  * YahtzeeServ Module Help
@@ -74,14 +80,14 @@ extern const char *ys_help_forcehtml[];
 /*
  * Variables
 */
-struct YahtzeeServ {
+typedef struct YahtzeeServCnf {
 	char yahtzeeroom[MAXCHANLEN];
 	int exclusions;
 	int multichan;
 	int chanoponly;
 	int html; 
 	char htmlpath[MAXPATH]; 
-} YahtzeeServ;
+} YahtzeeServCnf;
 
 typedef struct Players {
 	Client *u;
@@ -116,6 +122,7 @@ extern char *ysscoretype[15];
 extern int crs;
 extern int dtsc[6];
 extern char dicetext[5][15];
+extern YahtzeeServCnf YahtzeeServ;
 
 /*
  * Procedures
@@ -170,3 +177,4 @@ void reroll (const CmdParams *cmdparams, int rolltype);
 /* htmlscores */
 void ys_HTMLOutput( void );
 int ys_cmd_forcehtml( const CmdParams *cmdparams );
+#endif

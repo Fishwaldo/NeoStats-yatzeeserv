@@ -3,12 +3,12 @@
 /COPYING -text
 /ChangeLog -text
 /LICENSE -text
+/Makefile.am -text
 /Makefile.in -text
 /NEWS -text
 /README.YahtzeeServ -text
-/README.YahtzeeServ.html -text
-/README.YahtzeeServ.xml -text
 /RELNOTES -text
+/aclocal.m4 -text
 /channel.c -text
 /configure -text
 /configure.in -text

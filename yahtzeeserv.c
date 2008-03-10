@@ -121,6 +121,8 @@ char *ysscoretype[15];
 int crs;
 int dtsc[6];
 char dicetext[5][15];
+YahtzeeServCnf YahtzeeServ;
+Bot *ys_bot;
 
 /*
  * Online event processing
