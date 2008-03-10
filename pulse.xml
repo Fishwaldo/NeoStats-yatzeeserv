@@ -56,8 +56,8 @@
             </executable>
         </command>
         <command name="MakeDist">
-            <executable name="MakeSnap" exe="${base.dir}\\tools\\buildwin32snap.bat" args="${build.revision}"/>
-            <artifact name="YatzeeServ Setup File" file="${base.dir}\\tools\\YatzeeServ-Setup-*.exe"/>
+            <executable name="MakeSnap" exe="${base.dir}\\win32\\buildwin32snap.bat" args="${build.revision}"/>
+            <artifact name="YatzeeServ Setup File" file="${base.dir}\\win32\\YatzeeServ-Setup-*.exe"/>
         </command>
     </recipe>
 </project>

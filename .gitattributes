@@ -8,6 +8,7 @@
 /NEWS -text
 /README.YahtzeeServ -text
 /RELNOTES -text
+/RELNOTES.win32.txt -text
 /aclocal.m4 -text
 /channel.c -text
 /configure -text
@@ -18,10 +19,14 @@ html/ys.tpl -text
 /install-sh -text
 /misc.c -text
 /modconfig.h.in -text
-/modconfigwin32.h -text
 /play.c -text
 /pulse.xml -text
+win32/YahtzeeServ.qsp -text
+win32/buildwin32snap.bat -text
+win32/modconfigwin32.h -text
+win32/neostatsversion.rc -text
 /yahtzeeserv.c -text
 /yahtzeeserv.h -text
+/yahtzeeserv.sln -text
 /yahtzeeserv.vcproj -text
 /yahtzeeserv_help.c -text
